@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Card, Tag, PageHeader, Button, Typography, Row } from 'antd';
+import React, { Component, Link } from 'react';
+import { Card, Tag, PageHeader, Button, Typography, Row, Rate } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import "./Place.css";
 
@@ -50,7 +50,7 @@ class Place extends Component {
           {/*{this.props.post.address}*/}
           {/*</Paragraph>*/}
           <h3>{this.props.post.address}</h3>
-
+          <Rate allowHalf defaultValue={0} value={this.props.post.vote} />
         </Content>
       </PageHeader>
     );

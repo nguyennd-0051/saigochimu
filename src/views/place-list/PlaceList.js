@@ -1,39 +1,15 @@
-import React from "react";
+import React, { Link }  from "react";
 // import AddTag from "./components/addTag";
 
 import Place from "../../components/place/Place";
 import TagList from "../../components/tagList/TagList";
 import NavBar from "../../components/navbar/NavBar";
 import "./PlaceList.css";
-import { Layout, Menu, Carousel, Avatar, Row, Col, Tag } from 'antd';
+import { Layout, Menu, Carousel, Avatar, Row, Col, Tag, Rate } from 'antd';
 import axios from "axios";
 
 
 const { CheckableTag } = Tag;
-const exampleContent1 =
-    `Ant Design interprets the color system into two levels: a system-level color system and a
-      product-level color system.
-      Ant Designs design team preferred to design with the HSB color model, which makes it
-      easier for designers to have a clear psychological expectation of color when adjusting colors,
-      as well as facilitate communication in teams.`;
-const exampleContent2 =
-    `If you’re thinking of starting your very own blog, but just don’t have a clue on what to blog about, then fear not!
-
-In this article, I have included a whole load of blog examples from a wide variety of different niches.
-
-Since the beginning of the internet, millions and millions and millions of blogs have been created. Many have died due to lost interest or their owners giving up on the idea, while others have thrived and continue to grow, making money and earning their owners a steady income. It’s a constant evolution of content that keeps people coming back for more, especially if these blogs contact highly resourceful material that people find useful and interesting.
-
-Each example listed in this blog post are all different in some way and all bring something unique to their readers & subscribers. I want to show you what is possible and how you can take inspiration from them and create an awesome blog of your own.
-
-Some of these blogs make over $100k a month, others are just a hobby for their owners, but all have the same purpose at their core… the love of writing and sharing information.`
-const exampleContent3 =
-    `One of the more popular frugal blogs in the UK, Miss Thrifty is targeting young mums with her money saving, frugal tips and articles. And rightly so! The market is massive and she’s meeting a need for this type of information. Young mums aren’t exactly rolling in cash. They may have had to give up work and are now relying on just one wage coming in, so the need to be more frugal with everyday living is a must.
-
-The great thing about this blog is the conversational tone and the real person behind the brand. I think it’s inspiring to other mums to see someone like them making such a difference in other people’s lives by creating amazingly useful content that is 100% actionable. Also it may inspire mums to set up their own blog and to write about their experiences as a mother and a wife in the 21st century.`
-const exampleContent4 =
-    `Medium is not like any other platform on the internet. Our sole purpose is to help you find compelling ideas, knowledge, and perspectives. We don’t serve ads—we serve you, the curious reader who loves to learn new things. Medium is home to thousands of independent voices, and we combine humans and technology to find the best reading for you—and filter out the rest.I love Medium’s new publications: OneZero, GEN, Heated. And, I’m especially excited about Tenderly.
-In a web full of pseudo thought-leaders, Medium is the one place that I can reliably come to and be better informed in the easiest way possible of the things that matter to me.
-`
 const exampleTagList = ["All","React","Blockchain","PHP","BrSE","AI"]
 const { Header, Content, Footer } = Layout;
 const dateFormat = {year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'};
@@ -122,11 +98,16 @@ class PlaceList extends React.Component {
         let renderPostList = placeList;
 
         return (placeList ? renderPostList.map((post,index) => (
-            <Place
+            // <Link to={`/place/${post.id}`}>
+            <a href={"http://localhost:3000/place/"+post.id}>
+                <Place
                 key={index}
                 post={post}
                 createPost={(value1, value2) => this.setState({ isUpdatePost: value1, idUpdatePost: value2})}
             />
+            </a>
+            
+            // </Link>
         ))
         : null
         );
@@ -156,21 +137,16 @@ class PlaceList extends React.Component {
                         <Carousel style={{ marginTop: 50 }} >
                             <div>
                                 <img
-                                    style={{width: '100%'}}
-                                    src="https://prisoliveras.com/wp-content/uploads/amazing-sunset-beach-high-defination-widescreen-background-wallpaper-image-free.jpg"
-                                    style={{verticalAlign: 'top'}}
+                                    style={{height: '700', width: '1900'}}
+                                    src="https://scontent.fhph1-2.fna.fbcdn.net/v/t1.0-9/124721735_3137057236399601_176059145388527394_o.jpg?_nc_cat=109&ccb=2&_nc_sid=730e14&_nc_ohc=Cf0GAbEIQMwAX9QMlBg&_nc_ht=scontent.fhph1-2.fna&oh=120dcb8d733227e7e4a201ea0ec9b746&oe=5FD0B084"
+                                    style={{verticalAlign: 'middle'}}
                                 ></img>
                             </div>
                         </Carousel>
 
-                        <div className="ml-auto mr-auto text-center col-md-6">
-                            <h1>{this.state.userInfo.name}</h1>
-                            <h3 className="text-uppercase">{this.state.userInfo.position}</h3>
-                            <h4 className="font-weight-light">{this.state.userInfo.company}</h4>
-                            <br/>
-                            <h3>Enjoy Reading!</h3>
-                            <br />
-                            <br />
+                        <div className="ml-auto mr-auto text-center col-md-6" style={{textAlign: "center", margin: 15}}>
+                            <h1>Chào mừng đến với iDate!</h1>
+                            <h2>Chúng tôi sẽ giúp bạn tìm ra địa điểm hẹn hò dễ hơn bao giờ hết!</h2>
                         </div>
                     </>
                 }
