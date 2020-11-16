@@ -4,8 +4,10 @@ import React, { Link }  from "react";
 import Place from "../../components/place/Place";
 import TagList from "../../components/tagList/TagList";
 import NavBar from "../../components/navbar/NavBar";
+import SearchBar from "../../components/searchBar/searchBar";
 import "./PlaceList.css";
-import { Layout, Menu, Carousel, Avatar, Row, Col, Tag, Rate } from 'antd';
+import { Layout, Menu, Carousel, Avatar, Row, Col, Tag, Rate, Tabs, Radio, Space } from 'antd';
+import orderBy from "lodash/orderBy";
 import axios from "axios";
 
 
@@ -32,18 +34,20 @@ class PlaceList extends React.Component {
             isCreatePost: true,
             currentPage: 'index',
             placeList: [],
-            idUpdatePost: -1
+            idUpdatePost: -1,
+            query: "",
+            tabPosition: "all",
         };
 
         this.handleChangeFilterTag = this.handleChangeFilterTag.bind(this);
     }
 
     componentDidMount() {
-        axios.get(`https://itss-2.herokuapp.com/palace`)
+        axios.get(`https://enigmatic-everglades-66523.herokuapp.com/palace`)
             .then(res => {
                 if (res.data) {
                     this.setState({
-                        placeList: res.data.allPalace
+                        placeList: res.data.allPalace,
                     });
                 }
                 console.log(res.data.allPalace);
@@ -86,7 +90,13 @@ class PlaceList extends React.Component {
         return Math.max(...idArray);
     };
 
-    renderPostList = (filterTagList) => {
+    renderPlaceNotFound = () => {
+        return(<Col span={24} key={1}><h2>Không tìm thấy cửa hàng</h2></Col>);
+    }
+
+    
+
+    renderPostList = (filterTagList, data) => {
         const {placeList} = this.state;
         console.log(placeList, 123);
         // let renderPostList = [];
@@ -95,21 +105,22 @@ class PlaceList extends React.Component {
         // } else {
         //     // renderPostList = placeList.filter(post => (post.selectedTag.filter((tag) => filterTagList.includes(tag)).length > 0));
         // }
-        let renderPostList = placeList;
+        let renderPostList = data;
 
-        return (placeList ? renderPostList.map((post,index) => (
+        return (data ? renderPostList.map((post,index) => (
             // <Link to={`/place/${post.id}`}>
-            <a href={"http://localhost:3000/place/"+post.id}>
-                <Place
-                key={index}
-                post={post}
-                createPost={(value1, value2) => this.setState({ isUpdatePost: value1, idUpdatePost: value2})}
-            />
-            </a>
-            
+                <Col span={8} key={index}>
+                    <a href={"http://localhost:3000/place/"+post.id}>
+                        <Place
+                        key={index}
+                        post={post}
+                        createPost={(value1, value2) => this.setState({ isUpdatePost: value1, idUpdatePost: value2})}
+                    />
+                    </a>
+                </Col>
             // </Link>
         ))
-        : null
+        : (<Col><h2>Không tìm thấy cửa hàng</h2></Col>)
         );
     };
 
@@ -119,8 +130,38 @@ class PlaceList extends React.Component {
         });
     };
 
+    handleSearch = value => {
+        this.setState({
+            query: value,
+        });
+    }
+
+    changeTabPosition = e => {
+        this.setState({ tabPosition: e.target.value });
+    };
+
 
     render() {
+        const lowerCaseQuery = this.state.query.toLowerCase();
+
+        if (this.state.tabPosition === "all") {
+            var FilteredData = this.state.placeList;
+        } 
+        else if (this.state.tabPosition === "under300") {
+            var FilteredData = this.state.placeList.filter(x => x["cost"] < 300000);
+        }
+        else if (this.state.tabPosition === "300to500") {
+            var FilteredData = this.state.placeList.filter(x => x["cost"] < 500000 & x["cost"] >= 300000 );
+        }
+        else if (this.state.tabPosition === "500to1000") {
+            var FilteredData = this.state.placeList.filter(x => x["cost"] < 1000000 & x["cost"] >= 500000 );
+        }
+        else if (this.state.tabPosition === "above1000") {
+            var FilteredData = this.state.placeList.filter(x => x["cost"] >= 1000000 );
+        }
+
+        let data = orderBy(this.state.query? FilteredData.filter(x => String(x["name"]).toLowerCase().includes(lowerCaseQuery)): FilteredData);
+
         return (
             <Layout className="layout" style={{background: "#fff"}}>
                 {/* <Menu theme="light" onClick={this.onClickChangePage} selectedKeys={[this.state.currentPage]} mode="horizontal" style={{ position: 'fixed', zIndex: 1, width: '100%', height: 50 }}>
@@ -153,15 +194,37 @@ class PlaceList extends React.Component {
 
                 <Content style={{ padding: '0 200px', marginTop: 0, minHeight: '90vh' }}>
                     <div className="site-layout-content">
+                        <div className="search-bar" style={{width:"60%", margin: "auto", marginBottom: "2em" }}>
+                            <SearchBar 
+                                value={this.state.query}
+                                handleSearch={this.handleSearch}
+                            >
+                            </SearchBar>
+                        </div>
+                        
+                        <div style={{width:"60%", margin: "auto", marginBottom: "2em" }}>
+                            <Space style={{ margin: "auto" }}>
+                                Khoảng giá:
+                                <Radio.Group value={this.state.tabPosition} onChange={this.changeTabPosition}>
+                                    <Radio.Button style={{ marginRight: "0.8em" }} value="all">Tất cả</Radio.Button>
+                                    <Radio.Button style={{ marginRight: "0.8em" }} value="under300">Dưới 300.000đ</Radio.Button>
+                                    <Radio.Button style={{ marginRight: "0.8em" }} value="300to500">Từ 300.000đ đến 500.000đ</Radio.Button>
+                                    <Radio.Button style={{ marginRight: "0.8em" }} value="500to1000">Từ 500.000đ đến 1.000.000đ</Radio.Button>
+                                    <Radio.Button style={{ marginRight: "0.8em" }} value="above1000">Từ 1.000.000đ</Radio.Button>
+                                </Radio.Group>
+                            </Space>
+                        </div>
+                        
+                        <Row>
                             <>
                                 {/*<TagList*/}
                                 {/*    tagList = {this.state.tagList}*/}
                                 {/*    filterTagList = {this.state.filterTagList}*/}
                                 {/*    handleChangeFilterTag = {this.handleChangeFilterTag}*/}
                                 {/*/>*/}
-                                {this.renderPostList(this.state.filterTagList)}
+                                {this.renderPostList(this.state.filterTagList, data)}
                             </>
-                        }
+                        </Row>  
                     </div>
 
                 </Content>
