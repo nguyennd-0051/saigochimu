@@ -213,8 +213,17 @@ class PlaceList extends React.Component {
                                     <Radio.Button value="500to1000">1.000.000đ</Radio.Button>
                                     <Radio.Button value="above1000">1.000.000đ+</Radio.Button>
                                 </Radio.Group>
+
+                                <Radio.Group disabled={true}>
+                                    <Radio.Button value="date">2 người</Radio.Button>
+                                    <Radio.Button value="family">Gia đình</Radio.Button>
+                                </Radio.Group>
                             </Space>
                         </div>
+
+                        {/* <div style={{width:"60%", margin: "auto", marginBottom: "2em" }}>
+                            
+                        </div> */}
                         
                         <Row>
                             <>

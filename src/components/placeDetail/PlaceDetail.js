@@ -4,7 +4,7 @@ import "./PlaceDetail.css";
 import { Layout, Carousel, Descriptions, Rate, Button, Modal, Form, Input, InputNumber, DatePicker, TimePicker, message } from 'antd';
 import * as axios from 'axios';
 
-const { Header, Content, Footer } = Layout;
+const { Footer } = Layout;
 
 const layout = {
   labelCol: { span: 8 },
