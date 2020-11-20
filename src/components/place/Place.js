@@ -1,8 +1,6 @@
-import React, { Component, Link } from 'react';
-import { Card, Tag, PageHeader, Button, Typography, Row, Rate, Col } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import React, { Component } from 'react';
+import { PageHeader, Typography, Row, Rate } from 'antd';
 import "./Place.css";
-import Column from 'antd/lib/table/Column';
 
 const { Paragraph } = Typography;
 

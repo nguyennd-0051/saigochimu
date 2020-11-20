@@ -1,9 +1,8 @@
 import React from "react";
 import NavBar from "../navbar/NavBar";
 import "./PlaceDetail.css";
-import { Layout, Carousel, Descriptions, Rate, Button, Modal, Form, Input, Checkbox, InputNumber, DatePicker, TimePicker, message } from 'antd';
+import { Layout, Carousel, Descriptions, Rate, Button, Modal, Form, Input, InputNumber, DatePicker, TimePicker, message } from 'antd';
 import * as axios from 'axios';
-import moment from 'moment';
 
 const { Header, Content, Footer } = Layout;
 
@@ -16,9 +15,6 @@ const tailLayout = {
 };
 
 const BookForm = (handleEditName, handleEditPhoneNumber, handleEditTime, handleEditDate, handleEditPeopleNumber, handleOk) => {
-  const onFinish = values => {
-    console.log('Success:', values);
-  };
 
   const onFinishFailed = errorInfo => {
     console.log('Failed:', errorInfo);
@@ -116,6 +112,7 @@ class PlaceDetail extends React.Component {
         peopleNumber: "",
         placeID: "",
         placeName: "",
+        placeImage: "",
         placeAddress: "",
       },
       palaceInfo: {},
@@ -141,6 +138,7 @@ class PlaceDetail extends React.Component {
             placeID: response.data.allPalace.id,
             placeName: response.data.allPalace.name,
             placeAddress: response.data.allPalace.address,
+            placeImage: response.data.allPalace.image
           },
         });
         console.log(this.state.palaceInfo);
@@ -168,12 +166,6 @@ class PlaceDetail extends React.Component {
     message.loading({ content: 'Đang tiến hành đặt chỗ...', key });
     const bookingData = this.state.item;
 
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(bookingData)
-    };
-
     axios.post(`https://enigmatic-everglades-66523.herokuapp.com/palace/${this.props.match.params.id}/book`, bookingData)
       .then(res => {
         this.setState({ 
@@ -185,6 +177,7 @@ class PlaceDetail extends React.Component {
             peopleNumber: "",
             placeID: this.state.palaceInfo.id,
             placeName: this.state.palaceInfo.name,
+            placeImage: this.state.palaceInfo.image,
             placeAddress: this.state.palaceInfo.address,
             bookingAt: Date().toLocaleString(),
           }, 
@@ -205,13 +198,6 @@ class PlaceDetail extends React.Component {
       })
       .catch(err => console.log(err));
 
-    // fetch(`http://localhost:8000/palace/${this.props.match.params.id}/book`, requestOptions)
-    //     .then(res => console.log(res.data))
-    //     .then(data => {
-    //       console.log(data);
-    //       this.setState({ bookingInfo: data })
-    //     });
-
   };
 
   handleCancel = e => {
@@ -222,30 +208,35 @@ class PlaceDetail extends React.Component {
   };
 
   handleEditName = e => {
-    this.state.item.name = e.target.value;
-    this.setState({item: this.state.item});
+    let item = this.state.item
+    item.name = e.target.value;
+    this.setState({item: item});
   }
 
   handleEditPhoneNumber = e => {
-    this.state.item.phone_number = e.target.value;
-    this.setState({item: this.state.item});
+    let item = this.state.item
+    item.phone_number = e.target.value;
+    this.setState({item: item});
   }
   
   handleEditTime = (time, timeString) => {
-    this.state.item.time = timeString;
-    this.setState({item: this.state.item});
+    let item = this.state.item
+    item.time = timeString;
+    this.setState({item: item});
 
   }
 
   handleEditDate = (date, dateString) => {
-    this.state.item.date = dateString;
-    this.setState({item: this.state.item});
+    let item = this.state.item
+    item.date = dateString;
+    this.setState({item: item});
 
   }
   
   handleEditPeopleNumber = e => {
-    this.state.item.people_number = e;
-    this.setState({item: this.state.item});
+    let item = this.state.item
+    item.people_number = e;
+    this.setState({item: item});
   }
 
   
@@ -260,7 +251,7 @@ class PlaceDetail extends React.Component {
 
 
   render() {
-    const key = 'updatable';
+    // const key = 'updatable';
     return (
         <>
         <NavBar
@@ -277,7 +268,7 @@ class PlaceDetail extends React.Component {
 
         <Carousel style={{ marginTop: 50 }} >
             <div>
-            <img style={{ width: '100%' }} src={this.state.palaceInfo.image}></img>
+            <img alt="place-ava" style={{ width: '100%' }} src={this.state.palaceInfo.image}></img>
             </div>
         </Carousel>
         <div className="ml-auto mr-auto col-md-8" style={{ marginTop: 25 }}>
