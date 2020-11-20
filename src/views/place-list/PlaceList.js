@@ -35,6 +35,8 @@ class PlaceList extends React.Component {
             idUpdatePost: -1,
             query: "",
             tabPosition: "all",
+            screenWidth: window.innerWidth,
+            screenHeight: window.innerHeight,
         };
 
         this.handleChangeFilterTag = this.handleChangeFilterTag.bind(this);
@@ -52,6 +54,11 @@ class PlaceList extends React.Component {
 
             })
             .catch(error => console.log(error));
+        window.addEventListener('resize', this.updateScreenSize);
+    }
+
+    updateScreenSize = () => {
+        this.setState({ screenWidth: window.innerWidth, screenHeight: window.innerHeight })
     }
 
     handleChangeFilterTag(tag, checked) {
@@ -169,13 +176,13 @@ class PlaceList extends React.Component {
                 />
                 {
                     <>
-                        <Carousel style={{ marginTop: 50}} autoplay='true' >
+                        <Carousel style={{ marginTop: 50 }} >
                             <div>
                                 <h1 style={{
-                                height: '280px',
+                                'text-align': 'center',
+                                height: `${window.innerHeight*0.55-50}px`,
                                 color: '#fff',
-                                lineHeight: '280px',
-                                textAlign: 'center',
+                                lineHeight: `${window.innerHeight*0.55-50}px`,
                                 background: '#364d79',
                                 }}>Welcome to iDate</h1>
                             </div>
