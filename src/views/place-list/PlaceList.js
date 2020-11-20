@@ -1,20 +1,18 @@
-import React, { Link }  from "react";
+import React  from "react";
 // import AddTag from "./components/addTag";
 
 import Place from "../../components/place/Place";
-import TagList from "../../components/tagList/TagList";
 import NavBar from "../../components/navbar/NavBar";
 import SearchBar from "../../components/searchBar/searchBar";
 import "./PlaceList.css";
-import { Layout, Menu, Carousel, Avatar, Row, Col, Tag, Rate, Tabs, Radio, Space } from 'antd';
+import { Layout, Carousel, Row, Col, Radio, Space } from 'antd';
 import orderBy from "lodash/orderBy";
 import axios from "axios";
 
 
-const { CheckableTag } = Tag;
 const exampleTagList = ["All","React","Blockchain","PHP","BrSE","AI"]
-const { Header, Content, Footer } = Layout;
-const dateFormat = {year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'};
+const { Content, Footer } = Layout;
+// const dateFormat = {year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'};
 class PlaceList extends React.Component {
     constructor() {
         super();
@@ -37,6 +35,8 @@ class PlaceList extends React.Component {
             idUpdatePost: -1,
             query: "",
             tabPosition: "all",
+            screenWidth: window.innerWidth,
+            screenHeight: window.innerHeight,
         };
 
         this.handleChangeFilterTag = this.handleChangeFilterTag.bind(this);
@@ -50,10 +50,13 @@ class PlaceList extends React.Component {
                         placeList: res.data.allPalace,
                     });
                 }
-                console.log(res.data.allPalace);
-
             })
             .catch(error => console.log(error));
+        window.addEventListener('resize', this.updateScreenSize);
+    }
+
+    updateScreenSize = () => {
+        this.setState({ screenWidth: window.innerWidth, screenHeight: window.innerHeight })
     }
 
     handleChangeFilterTag(tag, checked) {
@@ -69,7 +72,7 @@ class PlaceList extends React.Component {
         else {
             nextSelectedTags = filterTagList.filter(t => t !== tag);
         }
-        if (nextSelectedTags.length == 0) {
+        if (nextSelectedTags.length === 0) {
             nextSelectedTags = ["All"];
         }
         this.setState({ filterTagList: nextSelectedTags });
@@ -98,7 +101,6 @@ class PlaceList extends React.Component {
 
     renderPostList = (filterTagList, data) => {
         const {placeList} = this.state;
-        console.log(placeList, 123);
         // let renderPostList = [];
         // if (filterTagList.length == 1 && filterTagList[0] == "All") {
         //     renderPostList = placeList;
@@ -142,33 +144,29 @@ class PlaceList extends React.Component {
 
 
     render() {
+        var FilteredData
         const lowerCaseQuery = this.state.query.toLowerCase();
 
         if (this.state.tabPosition === "all") {
-            var FilteredData = this.state.placeList;
+            FilteredData = this.state.placeList;
         } 
         else if (this.state.tabPosition === "under300") {
-            var FilteredData = this.state.placeList.filter(x => x["cost"] < 300000);
+            FilteredData = this.state.placeList.filter(x => x["cost"] < 300000);
         }
         else if (this.state.tabPosition === "300to500") {
-            var FilteredData = this.state.placeList.filter(x => x["cost"] < 500000 & x["cost"] >= 300000 );
+            FilteredData = this.state.placeList.filter(x => x["cost"] < 500000 & x["cost"] >= 300000 );
         }
         else if (this.state.tabPosition === "500to1000") {
-            var FilteredData = this.state.placeList.filter(x => x["cost"] < 1000000 & x["cost"] >= 500000 );
+            FilteredData = this.state.placeList.filter(x => x["cost"] < 1000000 & x["cost"] >= 500000 );
         }
         else if (this.state.tabPosition === "above1000") {
-            var FilteredData = this.state.placeList.filter(x => x["cost"] >= 1000000 );
+            FilteredData = this.state.placeList.filter(x => x["cost"] >= 1000000 );
         }
 
         let data = orderBy(this.state.query? FilteredData.filter(x => String(x["name"]).toLowerCase().includes(lowerCaseQuery)): FilteredData);
 
         return (
             <Layout className="layout" style={{background: "#fff"}}>
-                {/* <Menu theme="light" onClick={this.onClickChangePage} selectedKeys={[this.state.currentPage]} mode="horizontal" style={{ position: 'fixed', zIndex: 1, width: '100%', height: 50 }}>
-          <Menu.Item key="index"><GitlabOutlined />My Blog</Menu.Item>
-          <Menu.Item key="create" style={{float: 'right'}}><EditOutlined />Create Post</Menu.Item>
-          <Menu.Item key="profile" style={{float: 'right'}}><UserOutlined />My Profile</Menu.Item>
-        </Menu> */}
                 <NavBar
                     currentPage = {this.state.currentPage}
                     onClickChangePage = {this.onClickChangePage}
@@ -177,18 +175,23 @@ class PlaceList extends React.Component {
                     <>
                         <Carousel style={{ marginTop: 50 }} >
                             <div>
+                                <h1 style={{
+                                textAlign: 'center',
+                                height: `${window.innerHeight*0.55-50}px`,
+                                color: '#fff',
+                                lineHeight: `${window.innerHeight*0.55-50}px`,
+                                background: '#364d79',
+                                }}>Welcome to iDate</h1>
+                            </div>
+                            <div>
                                 <img
-                                    style={{height: '700', width: '1900'}}
+                                    alt="Landing"
                                     src="https://scontent.fhph1-2.fna.fbcdn.net/v/t1.0-9/124721735_3137057236399601_176059145388527394_o.jpg?_nc_cat=109&ccb=2&_nc_sid=730e14&_nc_ohc=Cf0GAbEIQMwAX9QMlBg&_nc_ht=scontent.fhph1-2.fna&oh=120dcb8d733227e7e4a201ea0ec9b746&oe=5FD0B084"
-                                    style={{verticalAlign: 'middle'}}
+                                    style={{verticalAlign: 'middle', width: '100%'}}
                                 ></img>
                             </div>
                         </Carousel>
 
-                        <div className="ml-auto mr-auto text-center col-md-6" style={{textAlign: "center", margin: 15}}>
-                            <h1>Chào mừng đến với iDate!</h1>
-                            <h2>Chúng tôi sẽ giúp bạn tìm ra địa điểm hẹn hò dễ hơn bao giờ hết!</h2>
-                        </div>
                     </>
                 }
 
@@ -204,13 +207,12 @@ class PlaceList extends React.Component {
                         
                         <div style={{width:"60%", margin: "auto", marginBottom: "2em" }}>
                             <Space style={{ margin: "auto" }}>
-                                Khoảng giá:
                                 <Radio.Group value={this.state.tabPosition} onChange={this.changeTabPosition}>
-                                    <Radio.Button style={{ marginRight: "0.8em" }} value="all">Tất cả</Radio.Button>
-                                    <Radio.Button style={{ marginRight: "0.8em" }} value="under300">Dưới 300.000đ</Radio.Button>
-                                    <Radio.Button style={{ marginRight: "0.8em" }} value="300to500">Từ 300.000đ đến 500.000đ</Radio.Button>
-                                    <Radio.Button style={{ marginRight: "0.8em" }} value="500to1000">Từ 500.000đ đến 1.000.000đ</Radio.Button>
-                                    <Radio.Button style={{ marginRight: "0.8em" }} value="above1000">Từ 1.000.000đ</Radio.Button>
+                                    <Radio.Button value="all">Tất cả</Radio.Button>
+                                    <Radio.Button value="under300">300.000đ</Radio.Button>
+                                    <Radio.Button value="300to500">500.000đ</Radio.Button>
+                                    <Radio.Button value="500to1000">1.000.000đ</Radio.Button>
+                                    <Radio.Button value="above1000">1.000.000đ+</Radio.Button>
                                 </Radio.Group>
                             </Space>
                         </div>
