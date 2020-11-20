@@ -50,8 +50,6 @@ class PlaceList extends React.Component {
                         placeList: res.data.allPalace,
                     });
                 }
-                console.log(res.data.allPalace);
-
             })
             .catch(error => console.log(error));
         window.addEventListener('resize', this.updateScreenSize);
@@ -103,7 +101,6 @@ class PlaceList extends React.Component {
 
     renderPostList = (filterTagList, data) => {
         const {placeList} = this.state;
-        console.log(placeList, 123);
         // let renderPostList = [];
         // if (filterTagList.length == 1 && filterTagList[0] == "All") {
         //     renderPostList = placeList;
@@ -179,7 +176,7 @@ class PlaceList extends React.Component {
                         <Carousel style={{ marginTop: 50 }} >
                             <div>
                                 <h1 style={{
-                                'text-align': 'center',
+                                textAlign: 'center',
                                 height: `${window.innerHeight*0.55-50}px`,
                                 color: '#fff',
                                 lineHeight: `${window.innerHeight*0.55-50}px`,

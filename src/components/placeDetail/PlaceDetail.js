@@ -189,8 +189,6 @@ class PlaceDetail extends React.Component {
             bookingAt: Date().toLocaleString(),
           }, 
         });
-        console.log(bookingData);
-        console.log(res.data);
         if (res.data.success === 1) {
           setTimeout(() => {
             message.success({ content: 'Bạn đã đặt thành công!', key, duration: 2 });
