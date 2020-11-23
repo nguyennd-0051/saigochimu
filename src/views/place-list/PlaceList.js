@@ -3,7 +3,6 @@ import React  from "react";
 
 import Place from "../../components/place/Place";
 import NavBar from "../../components/navbar/NavBar";
-import SearchBar from "../../components/searchBar/searchBar";
 import "./PlaceList.css";
 import { Layout, Carousel, Row, Col, Radio, Space } from 'antd';
 import orderBy from "lodash/orderBy";
@@ -169,10 +168,12 @@ class PlaceList extends React.Component {
                 <NavBar
                     currentPage = {this.state.currentPage}
                     onClickChangePage = {this.onClickChangePage}
+                    value={this.state.query}
+                    handleSearch={this.handleSearch}
                 />
                 {
                     <>
-                        <Carousel style={{ marginTop: 50 }} >
+                        <Carousel style={{ marginTop: 50 }} autoplay="true">
                             <div>
                                 <h1 style={{
                                 textAlign: 'center',
@@ -184,7 +185,7 @@ class PlaceList extends React.Component {
                             </div>
                             <div>
                                 <img
-                                    alt="Landing"
+                                    alt="Landing 1"
                                     src="https://scontent.fhph1-2.fna.fbcdn.net/v/t1.0-9/124721735_3137057236399601_176059145388527394_o.jpg?_nc_cat=109&ccb=2&_nc_sid=730e14&_nc_ohc=Cf0GAbEIQMwAX9QMlBg&_nc_ht=scontent.fhph1-2.fna&oh=120dcb8d733227e7e4a201ea0ec9b746&oe=5FD0B084"
                                     style={{verticalAlign: 'middle', width: '100%'}}
                                 ></img>
@@ -196,13 +197,13 @@ class PlaceList extends React.Component {
 
                 <Content style={{ padding: '0 200px', marginTop: 0, minHeight: '90vh' }}>
                     <div className="site-layout-content">
-                        <div className="search-bar" style={{width:"60%", margin: "auto", marginBottom: "2em" }}>
+                        {/* <div className="search-bar" style={{width:"60%", margin: "auto", marginBottom: "2em" }}>
                             <SearchBar 
                                 value={this.state.query}
                                 handleSearch={this.handleSearch}
                             >
                             </SearchBar>
-                        </div>
+                        </div> */}
                         
                         <div style={{width:"60%", margin: "auto", marginBottom: "2em" }}>
                             <Space style={{ margin: "auto" }}>
@@ -213,8 +214,17 @@ class PlaceList extends React.Component {
                                     <Radio.Button value="500to1000">1.000.000đ</Radio.Button>
                                     <Radio.Button value="above1000">1.000.000đ+</Radio.Button>
                                 </Radio.Group>
+
+                                <Radio.Group disabled={true}>
+                                    <Radio.Button value="date">2 người</Radio.Button>
+                                    <Radio.Button value="family">Gia đình</Radio.Button>
+                                </Radio.Group>
                             </Space>
                         </div>
+
+                        {/* <div style={{width:"60%", margin: "auto", marginBottom: "2em" }}>
+                            
+                        </div> */}
                         
                         <Row>
                             <>

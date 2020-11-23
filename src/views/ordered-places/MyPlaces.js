@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react'
+import React, { Component } from 'react'
 import Navbar from '../../components/navbar/NavBar'
 import * as axios from 'axios';
 import { Table } from 'antd'
@@ -20,9 +20,11 @@ export default class MyPlaces extends Component {
   render() {
     var columns = [
       {
-        title: "Image",
+        title: "",
         dataIndex: 'image',
         key: 'image',
+        width: 150,
+        render: text => <img style={{width: '100%'}} src={text} alt="illustration" />
       },
       {
         title: "Customer",
@@ -47,6 +49,7 @@ export default class MyPlaces extends Component {
       let information = `Place name: ${place.placeName}${"\n"}Address: ${place.placeAddress}${"\n"}Date: ${place.date} 「${place.time}」`
       return dataSource.push({
         key: index,
+        image: place.placeImage,
         customer: customerInfo,
         information: information,
         gift: 'No',
