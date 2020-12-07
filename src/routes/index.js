@@ -1,5 +1,8 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
+import Signin from "../components/auth/Signin"
+import Signup from "../components/auth/Signup"
+import Profile from "../components/auth/UserProfile"
 import PlaceList from "../views/place-list/PlaceList";
 import PlaceDetail from "../components/placeDetail/PlaceDetail"
 import MyPlaces from '../views/ordered-places/MyPlaces'
@@ -10,8 +13,17 @@ const Routes = () => (
         <Route path='/myplaces'>
             <MyPlaces />
         </Route>
-        <Route path='/'>
+        <Route path='/home'>
             <PlaceList />
+        </Route>
+        <Route path='/login'>
+            <Signin />
+        </Route>
+        <Route path='/register'>
+            <Signup />
+        </Route>
+        <Route path='/profile'>
+            <Profile />
         </Route>
     </Switch>
 );

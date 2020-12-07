@@ -20,9 +20,9 @@ class SearchBar extends Component {
         return(
             <>
                 <Search
-                    placeholder="Nhập tên cửa hàng"
+                    placeholder="Input name"
                     allowClear
-                    enterButton="Tìm kiếm"
+                    enterButton="Search"
                     size="large"
                     onSearch={value => handleSearch(value)}
                 />

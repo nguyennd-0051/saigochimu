@@ -3,6 +3,8 @@ import NavBar from "../navbar/NavBar";
 import "./PlaceDetail.css";
 import { Layout, Carousel, Descriptions, Rate, Button, Modal, Form, Input, InputNumber, DatePicker, TimePicker, message } from 'antd';
 import * as axios from 'axios';
+import AuthService from "../../services/auth.service";
+
 
 const { Footer } = Layout;
 
@@ -114,6 +116,7 @@ class PlaceDetail extends React.Component {
         placeName: "",
         placeImage: "",
         placeAddress: "",
+        currentUser: undefined,
       },
       palaceInfo: {},
       visible: false,
@@ -145,6 +148,14 @@ class PlaceDetail extends React.Component {
         console.log(this.props.match.params.id);
       })
       .catch(err => console.log(err));
+
+    const user = AuthService.getCurrentUser();
+	
+      if (user) {
+        this.setState({
+        currentUser: user,
+        });
+      }
   }
 
   onClickChangePage = e => {
@@ -285,49 +296,51 @@ class PlaceDetail extends React.Component {
                   </Descriptions.Item>
               </Descriptions>
             </div>
-
-            <div style={{ margin: 25 }}>
+            {this.state.currentUser ? (<>
+              <div style={{ margin: 25 }}>
               <h3 style={{ textAlign: "center" }}>Enjoy!</h3>
-            <div style={{ textAlign: "center" }}>
-              <Button type="primary" shape="round" size="large" onClick={this.showModal}>
-                  Đặt chỗ
-              </Button>
-            </div>
-            <Modal
-              title="Đặt chỗ"
-              visible={this.state.visible}
-              onFinish={this.openMessage}
-              onCancel={this.handleCancel}
-              footer={[
-                <Button key="return" onClick={this.handleCancel }>
-                  Quay lại
-                </Button>,
-                // <Button key="submit" type="primary" onClick={this.handleOk}>
-                //   Đặt ngay
-                // </Button>,
-              ]}
-            >
-              {BookForm(
-                e => this.handleEditName(e),
-                e => this.handleEditPhoneNumber(e),
-                (time, timeString) => this.handleEditTime(time, timeString),
-                (date, dateString) => this.handleEditDate(date, dateString),
-                e => this.handleEditPeopleNumber(e),
-                e => this.handleOk(e)
-              )}
-
-              {/* <BookForm
-                handleEditName = {e => this.handleEditName(e)}
-                handleEditPhoneNumber = {e => this.handleEditPhoneNumber(e)}
-                handleEditTime = {e => this.handleEditTime(e)}
-                handleEditDate = {e => this.handleEditDate(e)}
-                handleEditPeopleNumber = {e => this.handleEditPeopleNumber(e)}
-
+              <div style={{ textAlign: "center" }}>
+                <Button type="primary" shape="round" size="large" onClick={this.showModal}>
+                    Đặt chỗ
+                </Button>
+              </div>
+              <Modal
+                title="Đặt chỗ"
+                visible={this.state.visible}
+                onFinish={this.openMessage}
+                onCancel={this.handleCancel}
+                footer={[
+                  <Button key="return" onClick={this.handleCancel }>
+                    Quay lại
+                  </Button>,
+                  // <Button key="submit" type="primary" onClick={this.handleOk}>
+                  //   Đặt ngay
+                  // </Button>,
+                ]}
               >
+                {BookForm(
+                  e => this.handleEditName(e),
+                  e => this.handleEditPhoneNumber(e),
+                  (time, timeString) => this.handleEditTime(time, timeString),
+                  (date, dateString) => this.handleEditDate(date, dateString),
+                  e => this.handleEditPeopleNumber(e),
+                  e => this.handleOk(e)
+                )}
 
-              </BookForm> */}
-            </Modal>
+                {/* <BookForm
+                  handleEditName = {e => this.handleEditName(e)}
+                  handleEditPhoneNumber = {e => this.handleEditPhoneNumber(e)}
+                  handleEditTime = {e => this.handleEditTime(e)}
+                  handleEditDate = {e => this.handleEditDate(e)}
+                  handleEditPeopleNumber = {e => this.handleEditPeopleNumber(e)}
+
+                >
+
+                </BookForm> */}
+              </Modal>
             </div>
+             </>) : null}
+            
         </div>
 
         <Footer style={{ textAlign: 'center' }}> ©2020 魔法使い</Footer>

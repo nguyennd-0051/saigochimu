@@ -4,9 +4,13 @@ import React  from "react";
 import Place from "../../components/place/Place";
 import NavBar from "../../components/navbar/NavBar";
 import "./PlaceList.css";
-import { Layout, Carousel, Row, Col, Radio, Space } from 'antd';
+import { Layout, Carousel, Row, Col, Radio, Space, Menu, Dropdown } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 import orderBy from "lodash/orderBy";
 import axios from "axios";
+import SearchBar from '../../components/searchBar/searchBar';
+
+import UserService from "../../services/user.service";
 
 
 const exampleTagList = ["All","React","Blockchain","PHP","BrSE","AI"]
@@ -33,7 +37,8 @@ class PlaceList extends React.Component {
             placeList: [],
             idUpdatePost: -1,
             query: "",
-            tabPosition: "all",
+            tabPosition: "Tất cả",
+            type: "Tất cả",
             screenWidth: window.innerWidth,
             screenHeight: window.innerHeight,
         };
@@ -140,28 +145,60 @@ class PlaceList extends React.Component {
         this.setState({ tabPosition: e.target.value });
     };
 
+    changeTabPositionDropDown = e => {
+        // console.log(e.key)
+        this.setState({ tabPosition: e.key });
+    };
+
+    changeType = e => {
+        // console.log(e.key)
+        this.setState({ type: e.key });
+    };
+
 
     render() {
         var FilteredData
         const lowerCaseQuery = this.state.query.toLowerCase();
 
-        if (this.state.tabPosition === "all") {
+        if (this.state.tabPosition === "Tất cả") {
             FilteredData = this.state.placeList;
         } 
-        else if (this.state.tabPosition === "under300") {
+        else if (this.state.tabPosition === "300.000đ") {
             FilteredData = this.state.placeList.filter(x => x["cost"] < 300000);
         }
-        else if (this.state.tabPosition === "300to500") {
+        else if (this.state.tabPosition === "500.000đ") {
             FilteredData = this.state.placeList.filter(x => x["cost"] < 500000 & x["cost"] >= 300000 );
         }
-        else if (this.state.tabPosition === "500to1000") {
+        else if (this.state.tabPosition === "1.000.000đ") {
             FilteredData = this.state.placeList.filter(x => x["cost"] < 1000000 & x["cost"] >= 500000 );
         }
-        else if (this.state.tabPosition === "above1000") {
+        else if (this.state.tabPosition === "1.000.000+đ") {
             FilteredData = this.state.placeList.filter(x => x["cost"] >= 1000000 );
         }
 
+        FilteredData = this.state.type === "Tất cả" ? FilteredData : FilteredData.filter(x => String(x["type"]).includes(this.state.type));
+
         let data = orderBy(this.state.query? FilteredData.filter(x => String(x["name"]).toLowerCase().includes(lowerCaseQuery)): FilteredData);
+
+        const priceMenu = (
+            <Menu key={this.state.tabPosition} onClick={this.changeTabPositionDropDown}>
+                <Menu.Item key="Tất cả" value="">Tất cả</Menu.Item>
+                <Menu.Item key="300.000đ" value="">300.000đ</Menu.Item>
+                <Menu.Item key="500.000đ" value="">500.000đ</Menu.Item>
+                <Menu.Item key="1.000.000đ" value="">1.000.000đ</Menu.Item>
+                <Menu.Item key="1.000.000+đ" value="">1.000.000đ+</Menu.Item>
+            </Menu>
+        )
+
+        const typeMenu = (
+            <Menu key={this.state.type} onClick={this.changeType}>
+                <Menu.Item key="Tất cả" value="">Tất cả</Menu.Item>
+                <Menu.Item key="restaurant" value="">Nhà hàng</Menu.Item>
+                <Menu.Item key="cinema" value="">Rạp chiếu phim</Menu.Item>
+                <Menu.Item key="cafe" value="">Quán cà phê</Menu.Item>
+                <Menu.Item key="fastfood" value="">Đồ ăn nhanh</Menu.Item>
+            </Menu>
+        )
 
         return (
             <Layout className="layout" style={{background: "#fff"}}>
@@ -194,26 +231,36 @@ class PlaceList extends React.Component {
 
                     </>
                 }
-
-                <Content style={{ padding: '0 200px', marginTop: 0, minHeight: '90vh' }}>
-                    <div className="site-layout-content">
-                        {/* <div className="search-bar" style={{width:"60%", margin: "auto", marginBottom: "2em" }}>
+                <br/>
+                <br/>
+                <br/>
+                <Content style={{ width: "100%", padding: '0 200px', margin: "auto", minHeight: '90vh' }}>
+                    {/* <div className="site-layout-content"> */}
+                        <div className="search-bar" style={{width:"60%", margin: "auto", marginBottom: "2em" }}>
                             <SearchBar 
                                 value={this.state.query}
                                 handleSearch={this.handleSearch}
                             >
                             </SearchBar>
-                        </div> */}
+                        </div>
                         
                         <div style={{width:"60%", margin: "auto", marginBottom: "2em" }}>
                             <Space style={{ margin: "auto" }}>
-                                <Radio.Group value={this.state.tabPosition} onChange={this.changeTabPosition}>
+                                {/* <Radio.Group value={this.state.tabPosition} onChange={this.changeTabPosition}>
                                     <Radio.Button value="all">Tất cả</Radio.Button>
                                     <Radio.Button value="under300">300.000đ</Radio.Button>
                                     <Radio.Button value="300to500">500.000đ</Radio.Button>
                                     <Radio.Button value="500to1000">1.000.000đ</Radio.Button>
                                     <Radio.Button value="above1000">1.000.000đ+</Radio.Button>
-                                </Radio.Group>
+                                </Radio.Group> */}
+
+                                <Dropdown overlay={priceMenu} trigger={['click']}>
+                                    <div>{this.state.tabPosition} <DownOutlined /> </div>
+                                </Dropdown>
+
+                                <Dropdown overlay={typeMenu} trigger={['click']}>
+                                    <div> <DownOutlined /> </div>
+                                </Dropdown>
 
                                 <Radio.Group disabled={true}>
                                     <Radio.Button value="date">2 người</Radio.Button>
@@ -236,7 +283,7 @@ class PlaceList extends React.Component {
                                 {this.renderPostList(this.state.filterTagList, data)}
                             </>
                         </Row>  
-                    </div>
+                    {/* </div> */}
 
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>Group6 ©2020 ITSS</Footer>
