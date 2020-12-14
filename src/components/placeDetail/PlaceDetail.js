@@ -343,7 +343,7 @@ class PlaceDetail extends React.Component {
             
         </div>
 
-        <Footer style={{ textAlign: 'center' }}> ©2020 魔法使い</Footer>
+        {/* <Footer style={{ textAlign: 'center' }}> ©2020 魔法使い</Footer> */}
       </Layout>
       </>
     );

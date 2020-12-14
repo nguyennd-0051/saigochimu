@@ -1,14 +1,11 @@
-import React, { Component, useRef } from 'react';
+import React, { Component } from 'react';
 import 'antd/dist/antd.css';
 import {Button, Form, Input, Layout, message, notification} from 'antd';
-import axios from 'axios';
 import { Redirect } from "react-router-dom";
 import NavBar from "../navbar/NavBar";
 // import CheckButton from "react-validation/build/button";
 
 import AuthService from "../../services/auth.service";
-
-const { Content } = Layout;
 
 const layout = {
   labelCol: { span: 7 },
@@ -94,7 +91,7 @@ export default class Signup extends Component {
         duration: 2
       });    }
      else {
-      if (this.state.password == this.state.repassword) {
+      if (this.state.password === this.state.repassword) {
         AuthService.register(
           this.state.username,
           this.state.email,
@@ -172,7 +169,7 @@ export default class Signup extends Component {
           <br/>
 
           <Form.Item
-            label="User name"
+            label="Tên đăng nhập"
             name="Name"
             rules={[{ min: 8, message: 'Username must be minimum 8 characters.' },{ required: true, message: 'Please input your nick name!' }]}
           >
@@ -180,7 +177,7 @@ export default class Signup extends Component {
           </Form.Item>
 
           <Form.Item
-            label="Email"
+            label="Địa chỉ email"
             name="Email"
             rules={[{
               type: 'email',
@@ -190,7 +187,7 @@ export default class Signup extends Component {
             <Input onChange={e => this.onChangeEmail(e)} />
           </Form.Item>
           <Form.Item
-            label="Password"
+            label="Mật khẩu"
             name="password"
             rules={[{ min: 8, message: 'Password must be minimum 8 characters!' },{ required: true, message: 'Please input your password!' }]}
           >
@@ -200,7 +197,7 @@ export default class Signup extends Component {
             />
           </Form.Item>
           <Form.Item
-            label="Confirm Password"
+            label="Xác nhận mật khẩu"
             name="Confirm password"
             rules={[{ required: true, message: 'Please input your password!' }]}
           >
@@ -210,12 +207,12 @@ export default class Signup extends Component {
             />
           </Form.Item>
 
-          <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
-            <Button type="primary" htmlType="submit">
-              Submit
+          <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 6 }}>
+            <Button type="primary" htmlType="submit" style={{ width: '8em' }}>
+              Đăng ký
             </Button >
-            <Button onClick={this.onCancel}>
-              Cancel
+            <Button onClick={this.onCancel} style={{ width: '8em' }}>
+              Hủy
             </Button >
             {/* <CheckButton
               style={{ display: "none" }}

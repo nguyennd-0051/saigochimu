@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import AuthService from "../../services/auth.service";
-import { Layout, Carousel, Descriptions, Rate, Button, Modal, Form, Input, InputNumber, DatePicker, TimePicker, message } from 'antd';
+import { Layout, Descriptions} from 'antd';
 import NavBar from "../navbar/NavBar";
 
 const { Footer } = Layout;

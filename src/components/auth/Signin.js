@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { Form, Input, Button, Checkbox, Layout, notification } from 'antd';
+import { Form, Input, Button, Layout, notification } from 'antd';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Redirect } from 'react-router-dom';
-import axios from "axios"
-import '../../App.css'
+import '../../App.css';
 import NavBar from "../navbar/NavBar";
 // import CheckButton from "react-validation/build/button";
 
@@ -11,8 +11,8 @@ import AuthService from "../../services/auth.service";
 const { Content } = Layout;
 
 const layout = {
-    labelCol: { span: 6 },
-    wrapperCol: { span: 16 },
+    labelCol: { span: 8 },
+    wrapperCol: { span: 18, offset: 3 },
 };
 const tailLayout = {
     wrapperCol: { offset: 5, span: 16 },
@@ -59,6 +59,10 @@ class Signin extends Component {
       password: e.target.value
     });
   }
+
+  // handleSignUp() {
+  //   return <Redirect to="/register" />
+  // }
 
   handleLogin(e) {
     e.preventDefault();
@@ -134,19 +138,17 @@ class Signin extends Component {
                             <h1 style={{textAlign: "center"}}>WELCOME TO IDATE</h1>
                             <br/>
                             <Form.Item
-                                label="Username"
                                 name="username"
                                 rules={[{ required: true, message: 'Please input your username!' }]}
                             >
-                                <Input onChange={e => this.onChangeUsername(e)} />
+                                <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Tên đăng nhập" onChange={e => this.onChangeUsername(e)} style={{ height: '3em' }}/>
                             </Form.Item>
 
                             <Form.Item
-                                label="Password"
                                 name="password"
                                 rules={[{ required: true, message: 'Please input your password!' }]}
                             >
-                                <Input.Password onChange={e => this.onChangePassword(e)} />
+                                <Input.Password prefix={<LockOutlined className="site-form-item-icon" />} placeholder="Mật khẩu" onChange={e => this.onChangePassword(e)} style={{ height: '3em' }} />
                             </Form.Item>
 
                             {/* <Form.Item {...tailLayout} name="remember" valuePropName="checked">
@@ -154,13 +156,13 @@ class Signin extends Component {
                                     this.checkBtn = c;
                                 }}>Remember me</Checkbox>
                             </Form.Item> */}
-                            <Form.Item {...tailLayout}>
-                              <Button type="primary" htmlType="submit" onClick={e => this.handleLogin(e)}>
-                                Submit
+                            <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 6 }}>
+                              <Button type="primary" size="large" htmlType="submit" onClick={e => this.handleLogin(e)} className="login-form-button" style={{ width: '10em' }} >
+                                Đăng nhập
                               </Button>
-                              <Button type="link" htmlType="button" href="/register" style={{marginLeft: 55 }}>
-                               Register
-                            </Button>
+                            </Form.Item>
+                            <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 4 }}>
+                              Bạn chưa có tài khoản ? <a href="/register">Đăng ký ngay!</a>
                             </Form.Item>
                           
                         </Form>
