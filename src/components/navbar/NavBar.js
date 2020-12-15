@@ -5,7 +5,7 @@ import SearchBar from '../searchBar/searchBar';
 import AuthService from "../../services/auth.service";
 import { Redirect } from 'react-router-dom';
 
-// import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import {
 	DingtalkOutlined
@@ -44,15 +44,15 @@ class NavBar extends Component {
 					{/* <Menu.Item key="index"><a href="/"><DingtalkOutlined />iDate</a></Menu.Item> */}
 					{currentUser ? (
 						<Menu theme="light" selectedKeys={[]} mode="horizontal" style={{ position: 'fixed', zIndex: 1, width: '100%', height: 50 }}>
-							<Menu.Item key="index"><a href="/home"><DingtalkOutlined />iDate</a></Menu.Item>
-							<Menu.Item key="logout" style={{float: 'right'}}><a href="/home" onClick={this.logOut}>Log out</a></Menu.Item>
-							<Menu.Item key="profile" style={{float: 'right'}}><a href="/profile"><UserOutlined />My Profile</a></Menu.Item>
+							<Menu.Item key="index"><Link to={`/home`}><DingtalkOutlined />iDate</Link></Menu.Item>
+							<Menu.Item key="logout" style={{float: 'right'}}><Link to={`/`} onClick={this.logOut}>Log out</Link></Menu.Item>
+							<Menu.Item key="profile" style={{float: 'right'}}><Link to={`/profile`}><UserOutlined />My Profile</Link></Menu.Item>
 						</Menu>
 					) : (
 						<Menu theme="light" selectedKeys={[]} mode="horizontal" style={{ position: 'fixed', zIndex: 1, width: '100%', height: 50 }}>
-							<Menu.Item key="index"><a href="/home"><DingtalkOutlined />iDate</a></Menu.Item>
-							<Menu.Item key="logout" style={{float: 'right'}}><a href="/register">Đăng ký</a></Menu.Item>
-							<Menu.Item key="profile" style={{float: 'right'}}><a href="/login">Đăng nhập</a></Menu.Item>
+							<Menu.Item key="index"><Link to={`/home`}><DingtalkOutlined />iDate</Link></Menu.Item>
+							<Menu.Item key="logout" style={{float: 'right'}}><Link to={`/register`}>Đăng ký</Link></Menu.Item>
+							<Menu.Item key="profile" style={{float: 'right'}}><Link to={`/login`}>Đăng nhập</Link></Menu.Item>
 							</Menu>
 					)}
 					
