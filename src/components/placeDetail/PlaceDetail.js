@@ -107,8 +107,8 @@ class PlaceDetail extends React.Component {
     super();
     this.state = {
       item: {
-        username: "",
-        userPhoneNumber: "",
+        name: "",
+        phoneNumber: "",
         time: "",
         date: "",
         peopleNumber: "",
@@ -116,8 +116,13 @@ class PlaceDetail extends React.Component {
         placeName: "",
         placeImage: "",
         placeAddress: "",
-        currentUser: undefined,
+        userID: "",
+        username: "",
+        userEmail: "",
+        bookingAt: "",
+        status: "processing",
       },
+      currentUser: undefined,
       palaceInfo: {},
       visible: false,
     };
@@ -135,14 +140,14 @@ class PlaceDetail extends React.Component {
     //   `https://itss-2.herokuapp.com/palace/1`
     )
       .then(response => {
+        let item = this.state.item
+        item.placeID = response.data.allPalace.id;
+        item.placeName = response.data.allPalace.name;
+        item.placeAddress = response.data.allPalace.address;
+        item.placeImage = response.data.allPalace.image;
         this.setState({ 
           palaceInfo: response.data.allPalace,
-          item: {
-            placeID: response.data.allPalace.id,
-            placeName: response.data.allPalace.name,
-            placeAddress: response.data.allPalace.address,
-            placeImage: response.data.allPalace.image
-          },
+          item: item,
         });
         console.log(this.state.palaceInfo);
         console.log(this.props.match.params.id);
@@ -152,8 +157,13 @@ class PlaceDetail extends React.Component {
     const user = AuthService.getCurrentUser();
 	
       if (user) {
+        let item = this.state.item
+        item.username = user.username;
+        item.userEmail = user.email;
+        item.userID = user.id
         this.setState({
-        currentUser: user,
+          currentUser: user,
+          item: item,
         });
       }
   }
@@ -176,13 +186,15 @@ class PlaceDetail extends React.Component {
     // e.preventDefault();
     message.loading({ content: 'Đang tiến hành đặt chỗ...', key });
     const bookingData = this.state.item;
+    bookingData.bookingAt = Date().toLocaleString();
 
-    axios.post(`https://enigmatic-everglades-66523.herokuapp.com/palace/${this.props.match.params.id}/book`, bookingData)
+    axios.post(`https://enigmatic-everglades-66523.herokuapp.com/api/order/create`, bookingData)
       .then(res => {
+        console.log(res.data)
         this.setState({ 
           item: {
-            username: "",
-            userPhoneNumber: "",
+            name: "",
+            phoneNumber: "",
             time: "",
             date: "",
             peopleNumber: "",
@@ -190,6 +202,10 @@ class PlaceDetail extends React.Component {
             placeName: this.state.palaceInfo.name,
             placeImage: this.state.palaceInfo.image,
             placeAddress: this.state.palaceInfo.address,
+            userID: this.state.currentUser.id,
+            username: this.state.currentUser.username,
+            userEmail: this.state.currentUser.email,
+            status: "processing",
             bookingAt: Date().toLocaleString(),
           }, 
         });
@@ -203,11 +219,16 @@ class PlaceDetail extends React.Component {
         }
         else {
           setTimeout(() => {
-            message.error({ content: 'Đã xảy ra lỗi, vui lòng thử lại!', key, duration: 2 });
+            message.error({ content: "Thất bại", key, duration: 2 });
           }, 200);
         }
       })
-      .catch(err => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        setTimeout(() => {
+          message.error({ content: "Thất bại", key, duration: 2 });
+        }, 200);
+      });
 
   };
 
@@ -226,7 +247,7 @@ class PlaceDetail extends React.Component {
 
   handleEditPhoneNumber = e => {
     let item = this.state.item
-    item.phone_number = e.target.value;
+    item.phoneNumber = e.target.value;
     this.setState({item: item});
   }
   
@@ -246,7 +267,7 @@ class PlaceDetail extends React.Component {
   
   handleEditPeopleNumber = e => {
     let item = this.state.item
-    item.people_number = e;
+    item.peopleNumber = e;
     this.setState({item: item});
   }
 
@@ -262,6 +283,7 @@ class PlaceDetail extends React.Component {
 
 
   render() {
+    console.log(this.state.item)
     // const key = 'updatable';
     return (
         <>

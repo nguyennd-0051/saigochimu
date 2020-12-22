@@ -33,6 +33,14 @@ class AuthService {
   getCurrentUser() {
     return JSON.parse(localStorage.getItem('user'));;
   }
+
+  isAdmin() {
+    let user = JSON.parse(localStorage.getItem('user'));
+    if (user.roles.name === "admin") {
+      return true;
+    }
+    else return false;
+  }
 }
 
 export default new AuthService();

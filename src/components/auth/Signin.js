@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Form, Input, Button, Layout, notification } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import '../../App.css';
 import NavBar from "../navbar/NavBar";
 // import CheckButton from "react-validation/build/button";
@@ -162,7 +162,7 @@ class Signin extends Component {
                               </Button>
                             </Form.Item>
                             <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 4 }}>
-                              Bạn chưa có tài khoản ? <a href="/register">Đăng ký ngay!</a>
+                              Bạn chưa có tài khoản ? <Link to="/register">Đăng ký ngay!</Link>
                             </Form.Item>
                           
                         </Form>

@@ -3,6 +3,7 @@ import NavBar from "../navbar/NavBar";
 import "./PresentDetail.css";
 import { Layout, Carousel, Descriptions, Rate, Button, Modal, Form, Input, InputNumber, DatePicker, TimePicker, message } from 'antd';
 import * as axios from 'axios';
+import AuthService from "../../services/auth.service";
 
 const { Footer } = Layout;
 
@@ -14,7 +15,7 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
-const BookForm = (handleEditName, handleEditPhoneNumber, handleEditTime, handleEditDate, handleEditPeopleNumber, handleOk) => {
+const BookForm = (handleEditName, handleEditPhoneNumber, handleEditReceiverName, handleEditReceiverAddress, handleEditReceiverPhoneNumber, handleOk) => {
 
     const onFinishFailed = errorInfo => {
       console.log('Failed:', errorInfo);
@@ -40,7 +41,7 @@ const BookForm = (handleEditName, handleEditPhoneNumber, handleEditTime, handleE
         validateMessages={validateMessages}
       >
         <Form.Item
-          label="Họ và tên"
+          label="Tên người đặt"
           name="name"
           rules={[{ required: true }]}
         >
@@ -48,45 +49,35 @@ const BookForm = (handleEditName, handleEditPhoneNumber, handleEditTime, handleE
         </Form.Item>
   
         <Form.Item
-          label="Số điện thoại"
+          label="Số điện thoại người đặt"
           name="phoneNumber"
           rules={[{ required: true }]}
         >
           <Input placeholder="VD: 0910000ko" onChange={(e)=>handleEditPhoneNumber(e)}/>
         </Form.Item>
   
-        <Form.Item 
-          label="Thời gian" 
-          style={{ marginBottom: 0 }} 
+        <Form.Item
+          label="Tên người nhận"
+          name="receiver"
+          rules={[{ required: true }]}
         >
-          <Form.Item 
-            name="time"
-            style={{ display: 'inline-block', width: 'calc(50% - 12px)' }} 
-            rules={[{ required: true, message: 'Hãy chọn giờ!' }]} 
-          >
-            <TimePicker placeholder="Chọn giờ" onChange={(time, timeString)=>handleEditTime(time, timeString)}/>
-          </Form.Item>
-          <span
-            style={{ display: 'inline-block', width: '24px', lineHeight: '32px', textAlign: 'center' }}
-          >
-            -
-          </span>
-          <Form.Item 
-            // label="Ngày" 
-            name="date"
-            style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
-            rules={[{ required: true, message: 'Hãy chọn ngày!' }]}
-          >
-            <DatePicker placeholder="Chọn ngày" onChange={(date, dateString)=>handleEditDate(date, dateString)}/>
-          </Form.Item>
+          <Input placeholder="VD: Đức" onChange={(e)=>handleEditReceiverName(e)}/>
         </Form.Item>
   
         <Form.Item
-          label="Số người"
-          name="peopleNumber"
+          label="Địa chỉ người nhận"
+          name="receiverAddress"
           rules={[{ required: true }]}
         >
-          <InputNumber min={1} max={10} onChange={(e)=>handleEditPeopleNumber(e)}/>
+          <Input placeholder="VD: Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội" onChange={(e)=>handleEditReceiverAddress(e)}/>
+        </Form.Item>
+  
+        <Form.Item
+          label="Số điện thoại người nhận"
+          name="receiverPhoneNumber"
+          rules={[{ required: true }]}
+        >
+          <Input placeholder="VD: 0910000ko" onChange={(e)=>handleEditReceiverPhoneNumber(e)}/>
         </Form.Item>
   
         <Form.Item {...tailLayout}>
@@ -104,19 +95,28 @@ class PresentDetail extends React.Component {
     super();
     this.state = {
       item: {
-        username: "",
-        userPhoneNumber: "",
-        time: "",
-        date: "",
-        peopleNumber: "",
+        name: "",
+        phoneNumber: "",
+        receiverName: "",
+        receiverAddress: "",
+        receiverPhoneNumber: "",
         presentID: "",
         presentName: "",
         presentImage: "",
         presentAddress: "",
+        status: "processing",
+        orderAt: "", 
       },
+      currentUser: undefined,
       presentInfo: {},
       visible: false,
     };
+
+    this.handleEditName = this.handleEditName.bind(this);
+    this.handleEditDate = this.handleEditReceiverName.bind(this);
+    this.handleEditTime = this.handleEditReceiverAddress.bind(this);
+    this.handleEditPhoneNumber = this.handleEditPhoneNumber.bind(this);
+    this.handleEditPeopleNumber = this.handleEditReceiverPhoneNumber.bind(this);
   }
 
   componentDidMount() {
@@ -126,28 +126,142 @@ class PresentDetail extends React.Component {
       //   `https://itss-2.herokuapp.com/palace/1`
     )
       .then(response => {
+        let item = this.state.item
+        item.presentID = response.data.allPresent.id;
+        item.presentName = response.data.allPresent.name;
+        item.presentAddress = response.data.allPresent.shop;
+        item.presentImage = response.data.allPresent.image;
         this.setState({
           presentInfo: response.data.allPresent,
-          item: {
-            presentID: response.data.allPresent.id,
-            presentName: response.data.allPresent.name,
-            presentAddress: response.data.allPresent.shop,
-            presentImage: response.data.allPresent.image
-          },
+          item: item,
         });
         console.log(this.state.presentInfo);
         console.log(this.props.match.params.id);
       })
       .catch(err => console.log(err));
+
+      const user = AuthService.getCurrentUser();
+	
+      if (user) {
+        let item = this.state.item
+        item.username = user.username;
+        item.userEmail = user.email;
+        item.userID = user.id
+        this.setState({
+          currentUser: user,
+          item: item,
+        });
+      }
   }
 
   onClickChangePage = e => {
     this.setState({
       currentPage: e.key,
     });
+    
+  };
+
+  //Modal handle function
+
+  showModal = () => {
+    this.setState({
+      visible: true,
+    });
+  };
+
+  handleOk = e => {
+    // e.preventDefault();
+    message.loading({ content: 'Đang tiến hành đặt chỗ...', key });
+    const bookingData = this.state.item;
+    bookingData.bookingAt = Date().toLocaleString();
+
+    axios.post(`https://enigmatic-everglades-66523.herokuapp.com/api/presentOrder/create`, bookingData)
+      .then(res => {
+        this.setState({ 
+          item: {
+            name: "",
+            phoneNumber: "",
+            receiverName: "",
+            receiverAddress: "",
+            receiverPhoneNumber: "",
+            presentID: this.state.presentInfo.id,
+            presentName: this.state.presentInfo.name,
+            presentImage: this.state.presentInfo.image,
+            presentAddress: this.state.presentInfo.address,
+            userID: this.state.currentUser.id,
+            username: this.state.currentUser.username,
+            userEmail: this.state.currentUser.email,
+            status: "processing",
+            bookingAt: Date().toLocaleString(),
+          }, 
+        });
+        if (res.data.success === 1) {
+          setTimeout(() => {
+            message.success({ content: 'Bạn đã đặt thành công!', key, duration: 2 });
+          }, 200);
+          this.setState({
+            visible: false,
+          });
+        }
+        else {
+          setTimeout(() => {
+            message.error({ content: 'Đã xảy ra lỗi, vui lòng thử lại!', key, duration: 2 });
+          }, 200);
+        }
+      })
+      .catch(err => console.log(err));
+
+  };
+
+  handleCancel = e => {
+    console.log(e);
+    this.setState({
+      visible: false,
+    });
+  };
+
+  handleEditName = e => {
+    let item = this.state.item
+    item.name = e.target.value;
+    this.setState({item: item});
+  }
+
+  handleEditPhoneNumber = e => {
+    let item = this.state.item
+    item.phoneNumber = e.target.value;
+    this.setState({item: item});
+  }
+  
+  handleEditReceiverName = e => {
+    let item = this.state.item
+    item.receiverName = e.target.value;
+    this.setState({item: item});
+  }
+
+  handleEditReceiverAddress = e => {
+    let item = this.state.item
+    item.receiverAddress = e.target.value;
+    this.setState({item: item});
+
+  }
+  
+  handleEditReceiverPhoneNumber = e => {
+    let item = this.state.item
+    item.receiverPhoneNumber = e.target.value;
+    this.setState({item: item});
+  }
+
+  
+
+  openMessage = () => {
+    message.loading({ content: 'Loading...', key });
+    setTimeout(() => {
+      message.success({ content: 'Loaded!', key, duration: 2 });
+    }, 1000);
   };
 
   render() {
+    console.log(this.state.item)
     return (
       <>
         <NavBar
@@ -180,14 +294,15 @@ class PresentDetail extends React.Component {
               <h3 style={{ textAlign: "center" }}>Enjoy!</h3>
               <div style={{ textAlign: "center" }}>
                 <Button type="primary" shape="round" size="large" onClick={this.showModal}>
-                    Đặt chỗ
+                    Đặt quà
                 </Button>
               </div>
               <Modal
-                title="Đặt chỗ"
+                title="Đặt quà"
                 visible={this.state.visible}
                 onFinish={this.openMessage}
                 onCancel={this.handleCancel}
+                width={700}
                 footer={[
                   <Button key="return" onClick={this.handleCancel }>
                     Quay lại
@@ -200,9 +315,9 @@ class PresentDetail extends React.Component {
                 {BookForm(
                   e => this.handleEditName(e),
                   e => this.handleEditPhoneNumber(e),
-                  (time, timeString) => this.handleEditTime(time, timeString),
-                  (date, dateString) => this.handleEditDate(date, dateString),
-                  e => this.handleEditPeopleNumber(e),
+                  e => this.handleEditReceiverName(e),
+                  e => this.handleEditReceiverAddress(e),
+                  e => this.handleEditReceiverPhoneNumber(e),
                   e => this.handleOk(e)
                 )}
 

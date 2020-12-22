@@ -6,18 +6,90 @@ import Present from "../../components/present/Present";
 import NavBar from "../../components/navbar/NavBar";
 import "./PlaceList.css";
 import { Layout, Carousel, Row, Col, Radio, Space, Menu, Dropdown, Button, Tabs, PageHeader } from 'antd';
+import { Descriptions, Rate, Modal, Form, Input, InputNumber, DatePicker, TimePicker, message } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import orderBy from "lodash/orderBy";
 import axios from "axios";
 import SearchBar from '../../components/searchBar/searchBar';
+import AuthService from "../../services/auth.service";
+
 
 import UserService from "../../services/user.service";
 
 const { TabPane } = Tabs;
 
+const layout = {
+    labelCol: { span: 8 },
+    wrapperCol: { span: 16 },
+  };
+  const tailLayout = {
+    wrapperCol: { offset: 8, span: 16 },
+  };
+const key = 'updatable';
 const exampleTagList = ["All","React","Blockchain","PHP","BrSE","AI"]
 const { Content, Footer } = Layout;
 // const dateFormat = {year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'};
+
+const BookForm = (handleEditName, handleEditPhoneNumber, handleEditPeopleNumber, handleOk) => {
+
+    const onFinishFailed = errorInfo => {
+      console.log('Failed:', errorInfo);
+    };
+  
+    const validateMessages = {
+      required: 'Hãy điền ${label}!',
+      types: {
+        email: '${label} is not a valid email!',
+        number: '${label} is not a valid number!',
+      },
+      number: {
+        range: '${label} must be between ${min} and ${max}',
+      },
+    };
+  
+    return (
+      <Form
+        {...layout}
+        name="basic"
+        onFinish={(e)=>handleOk(e)}
+        onFinishFailed={onFinishFailed}
+        validateMessages={validateMessages}
+      >
+        <Form.Item
+          label="Họ và tên"
+          name="name"
+          rules={[{ required: true }]}
+        >
+          <Input placeholder="VD: Nga Valin" onChange={(e)=>handleEditName(e)}/>
+        </Form.Item>
+  
+        <Form.Item
+          label="Số điện thoại"
+          name="phoneNumber"
+          rules={[{ required: true }]}
+        >
+          <Input placeholder="VD: 0910000ko" onChange={(e)=>handleEditPhoneNumber(e)}/>
+        </Form.Item>
+  
+        
+  
+        <Form.Item
+          label="Số người"
+          name="peopleNumber"
+          rules={[{ required: true }]}
+        >
+          <InputNumber min={1} max={10} onChange={(e)=>handleEditPeopleNumber(e)}/>
+        </Form.Item>
+  
+        <Form.Item {...tailLayout}>
+          <Button htmlType="submit" type="primary">
+            Đặt ngay
+          </Button>
+        </Form.Item>
+      </Form>
+    );
+  };
+
 class PlaceList extends React.Component {
     constructor() {
         super();
@@ -29,6 +101,17 @@ class PlaceList extends React.Component {
                 company: "Google Inc.",
                 technology: "Python, NodeJS, ReactJS",
                 hobby: "Reading Books, Travel"
+            },
+            item: {
+                name: "",
+                phoneNumber: "",
+                peopleNumber: "",
+                comboID: "",
+                userID: "",
+                username: "",
+                userEmail: "",
+                bookingAt: "",
+                status: "processing",
             },
             tagList: exampleTagList, //initial value must have tag "All"
             filterTagList: ["All"],
@@ -47,6 +130,8 @@ class PlaceList extends React.Component {
             event: "Tất cả",
             screenWidth: window.innerWidth,
             screenHeight: window.innerHeight,
+            currentUser: undefined,
+            visible: false,
         };
 
         this.handleChangeFilterTag = this.handleChangeFilterTag.bind(this);
@@ -87,7 +172,18 @@ class PlaceList extends React.Component {
             })
             .catch(error => console.log(error));
         // }
-        
+        const user = AuthService.getCurrentUser();
+	
+        if (user) {
+            let item = this.state.item
+            item.username = user.username;
+            item.userEmail = user.email;
+            item.userID = user.id
+            this.setState({
+            currentUser: user,
+            item: item,
+            });
+        }
         window.addEventListener('resize', this.updateScreenSize);
     }
 
@@ -165,7 +261,7 @@ class PlaceList extends React.Component {
         let renderPostList = data;
 
         return (data ? renderPostList.map((post,index) => (
-                <Col span={6} key={index}>
+                <Col span={8} key={index}>
                     <a href={"http://localhost:3000/present/"+post.id}>
                         <Present
                         key={index}
@@ -193,6 +289,34 @@ class PlaceList extends React.Component {
                 title={`${set.startTime} - ${set.endTime}`}
                 // title={set.startTime}
             >
+              {this.state.currentUser ? (<>
+                    <div style={{ margin: 25 }}>
+                    <h3 style={{ textAlign: "center" }}></h3>
+                    <div style={{ textAlign: "center" }}>
+                        <Button type="primary" shape="round" size="large" onClick={this.showModal}>
+                            Đặt chỗ
+                        </Button>
+                    </div>
+                    <Modal
+                        title="Đặt chỗ"
+                        visible={this.state.visible}
+                        onFinish={this.openMessage}
+                        onCancel={this.handleCancel}
+                        footer={[
+                        <Button key="return" onClick={this.handleCancel }>
+                            Quay lại
+                        </Button>,
+                        ]}
+                    >
+                        {BookForm(
+                        e => this.handleEditName(e),
+                        e => this.handleEditPhoneNumber(e),
+                        e => this.handleEditPeopleNumber(e),
+                        e => this.handleOk(e,set.id)
+                        )}
+                    </Modal>
+                    </div>
+                </>) : null}
                 <Row>
                     <Col span={12}>
                         {/*<a href={"http://localhost:3000/place/"+set[0].id}>*/}
@@ -253,8 +377,93 @@ class PlaceList extends React.Component {
         this.setState({ type: e.key });
     };
 
+    showModal = () => {
+        this.setState({
+          visible: true,
+        });
+      };
+
+    handleEditName = e => {
+        let item = this.state.item
+        item.name = e.target.value;
+        this.setState({item: item});
+      }
+    
+    handleEditPhoneNumber = e => {
+        let item = this.state.item
+        item.phoneNumber = e.target.value;
+        this.setState({item: item});
+      }
+      
+    handleEditPeopleNumber = e => {
+        let item = this.state.item
+        item.peopleNumber = e;
+        this.setState({item: item});
+      }
+    
+    handleOk = (e, comboID) => {
+        // e.preventDefault();
+        message.loading({ content: 'Đang tiến hành đặt chỗ...', key });
+        const bookingData = this.state.item;
+        bookingData.bookingAt = Date().toLocaleString();
+        bookingData.comboID = comboID;
+        console.log(comboID)
+        axios.post(`https://enigmatic-everglades-66523.herokuapp.com/api/comboOrder/create`, bookingData)
+          .then(res => {
+            console.log(res.data)
+            this.setState({ 
+              item: {
+                name: "",
+                phoneNumber: "",
+                peopleNumber: "",
+                comboID: "",
+                userID: this.state.currentUser.id,
+                username: this.state.currentUser.username,
+                userEmail: this.state.currentUser.email,
+                status: "processing",
+                bookingAt: Date().toLocaleString(),
+              }, 
+            });
+            if (res.data.success === 1) {
+              setTimeout(() => {
+                message.success({ content: 'Bạn đã đặt thành công!', key, duration: 2 });
+              }, 200);
+              this.setState({
+                visible: false,
+              });
+            }
+            else {
+              setTimeout(() => {
+                message.error({ content: "Thất bại!", key, duration: 2 });
+              }, 200);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            setTimeout(() => {
+              message.error({ content: "Thất bại!", key, duration: 2 });
+            }, 200);
+          });
+    
+      };
+    
+      handleCancel = e => {
+        console.log(e);
+        this.setState({
+          visible: false,
+        });
+      };
+
+      openMessage = () => {
+        message.loading({ content: 'Loading...', key });
+        setTimeout(() => {
+          message.success({ content: 'Loaded!', key, duration: 2 });
+        }, 1000);
+      };
+
 
     render() {
+        console.log(this.state.item)
         var FilteredData, rawData;
         const lowerCaseQuery = this.state.query.toLowerCase();
 
@@ -358,7 +567,7 @@ class PlaceList extends React.Component {
                 <br/>
                 <Content style={{ width: "100%", padding: '0 200px', margin: "auto", minHeight: '90vh' }}>
                     {/* <div className="site-layout-content"> */}
-                    <Tabs defaultActiveKey={this.state.tabPosition}  onChange={e => this.changeTabPosition(e)} centered>
+                    <Tabs defaultActiveKey={this.state.tabPosition} style={{fontSize:"1.3em",}} size="large"  onChange={e => this.changeTabPosition(e)} centered>
                         {/* <div style={{width:"60%", margin: "auto", marginBottom: "2em" }}>
                         </div> */}
                         <TabPane tab="Đặt chỗ" key="palace">
@@ -372,13 +581,6 @@ class PlaceList extends React.Component {
                             
                             <div style={{width:"60%", margin: "auto", marginBottom: "2em" }}>
                                 <Space style={{ margin: "auto" }}>
-                                    {/* <Radio.Group value={this.state.tabPosition} onChange={this.changeTabPosition}>
-                                        <Radio.Button value="all">Tất cả</Radio.Button>
-                                        <Radio.Button value="under300">300.000đ</Radio.Button>
-                                        <Radio.Button value="300to500">500.000đ</Radio.Button>
-                                        <Radio.Button value="500to1000">1.000.000đ</Radio.Button>
-                                        <Radio.Button value="above1000">1.000.000đ+</Radio.Button>
-                                    </Radio.Group> */}
                                 
                                     Giá: <Dropdown overlay={priceMenu} trigger={['click']}>
                                         <Button style={{marginRight: "4em" }}>{this.state.priceFilter} <DownOutlined /> </Button>
@@ -387,6 +589,10 @@ class PlaceList extends React.Component {
                                     Loại: <Dropdown overlay={typeMenu} trigger={['click']}>
                                     <Button>{this.state.type} <DownOutlined /> </Button>
                                     </Dropdown>
+
+                                    {this.state.type === "Nhà hàng" ? <Dropdown overlay={typeMenu} trigger={['click']}>
+                                    <Button>{this.state.type} <DownOutlined /> </Button>
+                                    </Dropdown>:null}
 
                                     {/* <Radio.Group disabled={true}>
                                         <Radio.Button value="date">2 người</Radio.Button>
