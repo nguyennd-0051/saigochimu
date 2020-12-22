@@ -134,6 +134,7 @@ class PlaceList extends React.Component {
             type: "Tất cả",
             typeRestaurant: {
                 present: false,
+                kidPlayground: 0, // 0 - Kamawanai, 1 - Có
                 seating: 0, // 0 - All, 1 - date, 2 - family
             },
             event: "Tất cả",
@@ -168,10 +169,12 @@ class PlaceList extends React.Component {
                         if (place.type === "Nhà hàng") {
                             let typeRestaurant = {
                                 present: false,
+                                kidPlayground: false,
                                 seating: [],
                             }
-                            if (place.id % 6 === 1) typeRestaurant.present = true 
-                            if (place.id % 10 !== 2) typeRestaurant.seating.push(1)
+                            if (place.id % 3 === 1) typeRestaurant.present = true 
+                            if (place.id % 4 === 1) typeRestaurant.kidPlayground = 1 
+                            if (place.id % 5 !== 2) typeRestaurant.seating.push(1)
                             if (place.id % 8 !== 3) typeRestaurant.seating.push(2)
                             place.typeRestaurant = typeRestaurant
                             return place
@@ -189,7 +192,7 @@ class PlaceList extends React.Component {
 
                         return place
                     })
-                    console.log(places)
+                    // console.log(places)
                     this.setState({
                         // placeList: res.data.allPalace,
                         placeList: places,
@@ -416,6 +419,7 @@ class PlaceList extends React.Component {
         this.setState({ type: e.key });
     };
 
+    // Support function for restaurant omni-filter
     changeRestaurantPresent = () => {
         let newTypeRestaurant = this.state.typeRestaurant
         newTypeRestaurant.present = !newTypeRestaurant.present
@@ -427,6 +431,14 @@ class PlaceList extends React.Component {
     changeRestaurantSeating = (e) => {
         let newTypeRestaurant = this.state.typeRestaurant
         newTypeRestaurant.seating = parseInt(e.key, 10)
+        this.setState({
+            typeRestaurant: newTypeRestaurant
+        })
+    }
+
+    changeKidPlayground = (e) => {
+        let newTypeRestaurant = this.state.typeRestaurant
+        newTypeRestaurant.kidPlayground = 1 - this.state.typeRestaurant.kidPlayground
         this.setState({
             typeRestaurant: newTypeRestaurant
         })
@@ -565,6 +577,12 @@ class PlaceList extends React.Component {
                 })
             } 
             
+            if (this.state.typeRestaurant.kidPlayground !== 0) {
+                FilteredData = FilteredData.filter(place => {
+                    return place.typeRestaurant.kidPlayground === 1
+                })
+            }
+            
             if (this.state.typeRestaurant.seating !== 0) {
                 FilteredData = FilteredData.filter(place => {
                     return place.typeRestaurant.seating.includes(this.state.typeRestaurant.seating)
@@ -684,7 +702,8 @@ class PlaceList extends React.Component {
                                         <Restaurant 
                                             typeRestaurant={this.state.typeRestaurant} 
                                             changeRestaurantPresent={this.changeRestaurantPresent}
-                                            changeRestaurantSeating={this.changeRestaurantSeating}/> 
+                                            changeRestaurantSeating={this.changeRestaurantSeating}
+                                            changeKidPlayground={this.changeKidPlayground}/> 
                                         : null}
 
                                     {/* <Radio.Group disabled={true}>

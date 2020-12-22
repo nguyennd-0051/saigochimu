@@ -1,12 +1,12 @@
-import React from 'react'
-import { Menu, Dropdown, Button, Switch, Space } from 'antd'
+import React, { useState } from 'react'
+import { Menu, Dropdown, Button, Switch, Space, Radio } from 'antd'
 import { DownOutlined } from '@ant-design/icons';
 
 export default function Restaurant(props) {
-
   // type
   // present: false,
-  // seating: 0, // 0 - All, 1 - date, 2 - family
+  // seating: 0, 0 - All, 1 - date, 2 - family
+  // kidPlayground: 0, 0 - Kamawanai, 1 - Có
 
   const typePresent = (
     <Menu key={props.typeRestaurant.seating} onClick={props.changeRestaurantSeating}>
@@ -25,6 +25,12 @@ export default function Restaurant(props) {
     
   )
 
+  const radioStyle = {
+    display: 'block',
+    height: '30px',
+    lineHeight: '30px',
+  };
+
   return (
     <Space style={{ margin: "auto" }}>
       <Switch checkedChildren="Tặng quà" unCheckedChildren="Tặng quà" onClick={props.changeRestaurantPresent} />
@@ -33,6 +39,10 @@ export default function Restaurant(props) {
       Loại chỗ: <Dropdown overlay={typePresent} trigger={['click']}>
         <Button>{typeSeating} <DownOutlined /> </Button>
       </Dropdown>
+
+      <Radio.Group value={props.typeRestaurant.kidPlayground}>
+        <Radio.Button style={radioStyle} value={1} onClick={props.changeKidPlayground}>Trông trẻ</Radio.Button>
+      </Radio.Group>
     </Space>
   )
 }
