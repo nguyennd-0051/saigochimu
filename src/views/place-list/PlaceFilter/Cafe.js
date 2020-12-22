@@ -1,17 +1,17 @@
 import React from 'react'
 import { Space, Radio } from 'antd'
-// import { DownOutlined } from '@ant-design/icons';
 
 export default function Cafe(props) {
 
   const radioStyle = {
     display: 'block',
-    height: '30px',
-    lineHeight: '30px',
+    height: '100%',
+    textAlign: 'center',
+    borderRadius: '25px',
   };
 
   return (
-    <Space style={{ margin: "auto" }}>
+    <Space style={{float:"right",marginLeft:"auto"}} >
       <Radio.Group value={props.typeCoffee.view}>
         <Radio.Button style={radioStyle} value={1} onClick={props.changeCoffeeView}>View</Radio.Button>
       </Radio.Group>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Menu, Dropdown, Button, Space, Radio } from 'antd'
 import { DownOutlined } from '@ant-design/icons';
 
@@ -16,13 +16,13 @@ export default function Restaurant(props) {
     </Menu>
   )
 
-  const options1 = [
-    { label: 'Trông trẻ'},
-  ];
+  // const options1 = [
+  //   { label: 'Trông trẻ'},
+  // ];
 
-  const options2 = [
-    { label: 'Tặng quà'},
-  ];
+  // const options2 = [
+  //   { label: 'Tặng quà'},
+  // ];
 
   const typeSeating = (
     props.typeRestaurant ? (

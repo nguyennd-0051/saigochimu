@@ -756,6 +756,12 @@ class PlaceList extends React.Component {
                                             typeCinema={this.state.typeCinema} 
                                             changeSweetBox={this.changeSweetBox}/> 
                                     : null} 
+                                    {this.state.type === "Quán cà phê" ? 
+                                        <Cafe  
+                                            typeCoffee={this.state.typeCoffee} 
+                                            changeCoffeeView={this.changeCoffeeView}
+                                            changeCoffeeNoSmoking={this.changeCoffeeNoSmoking}/> 
+                                    : null} 
                                 </div>
                             </div>
                             <Row>
