@@ -1,20 +1,21 @@
-import React  from "react";
+import React from "react";
 // import AddTag from "./components/addTag";
 
 import Place from "../../components/place/Place";
 import Present from "../../components/present/Present";
 import NavBar from "../../components/navbar/NavBar";
 import "./PlaceList.css";
-import { Layout, Carousel, Row, Col, Radio, Space, Menu, Dropdown, Button, Tabs, PageHeader } from 'antd';
-import { Descriptions, Rate, Modal, Form, Input, InputNumber, DatePicker, TimePicker, message } from 'antd';
+import { Layout, Carousel, Row, Col, Space, Menu, Dropdown, Button, Tabs, PageHeader } from 'antd';
+import { Modal, Form, Input, InputNumber, message } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import orderBy from "lodash/orderBy";
 import axios from "axios";
 import SearchBar from '../../components/searchBar/searchBar';
 import AuthService from "../../services/auth.service";
+import Restaurant from './PlaceFilter/Restaurant'
 
 
-import UserService from "../../services/user.service";
+// import UserService from "../../services/user.service";
 
 const { TabPane } = Tabs;
 
@@ -37,12 +38,16 @@ const BookForm = (handleEditName, handleEditPhoneNumber, handleEditPeopleNumber,
     };
   
     const validateMessages = {
+      // eslint-disable-next-line
       required: 'Hãy điền ${label}!',
       types: {
+        // eslint-disable-next-line
         email: '${label} is not a valid email!',
+        // eslint-disable-next-line
         number: '${label} is not a valid number!',
       },
       number: {
+        // eslint-disable-next-line
         range: '${label} must be between ${min} and ${max}',
       },
     };
@@ -127,6 +132,11 @@ class PlaceList extends React.Component {
             tabPosition: "palace",
             priceFilter: "Tất cả",
             type: "Tất cả",
+            typeRestaurant: {
+                present: false,
+                kidPlayground: 0, // 0 - Kamawanai, 1 - Có
+                seating: 0, // 0 - All, 1 - date, 2 - family
+            },
             event: "Tất cả",
             screenWidth: window.innerWidth,
             screenHeight: window.innerHeight,
@@ -153,10 +163,42 @@ class PlaceList extends React.Component {
             axios.get(`https://enigmatic-everglades-66523.herokuapp.com/palace`)
             .then(res => {
                 if (res.data) {
+                    let places = res.data.allPalace
+                    places.map(place => {
+                        // Set nha hang
+                        if (place.type === "Nhà hàng") {
+                            let typeRestaurant = {
+                                present: false,
+                                kidPlayground: false,
+                                seating: [],
+                            }
+                            if (place.id % 3 === 1) typeRestaurant.present = true 
+                            if (place.id % 4 === 1) typeRestaurant.kidPlayground = 1 
+                            if (place.id % 5 !== 2) typeRestaurant.seating.push(1)
+                            if (place.id % 8 !== 3) typeRestaurant.seating.push(2)
+                            place.typeRestaurant = typeRestaurant
+                            return place
+                        }
+
+                        // set Rap chieu phim
+                        if (place.type === "Rạp chiếu phim") {
+                            // IMPLEMENT!!!
+                        }
+
+                        // set Quan ca phe
+                        if (place.type === "Quán cà phê") {
+                            // IMPLEMENT!!!
+                        }
+
+                        return place
+                    })
+                    // console.log(places)
                     this.setState({
-                        placeList: res.data.allPalace,
+                        // placeList: res.data.allPalace,
+                        placeList: places,
                     });
                 }
+                
             })
             .catch(error => console.log(error));
         // }
@@ -168,7 +210,7 @@ class PlaceList extends React.Component {
                         comboList: res.data.allCombo,
                     });
                 }
-                console.log(res.data.allCombo)
+                // console.log(res.data.allCombo)
             })
             .catch(error => console.log(error));
         // }
@@ -291,7 +333,7 @@ class PlaceList extends React.Component {
             >
               {this.state.currentUser ? (<>
                     <div style={{ margin: 25 }}>
-                    <h3 style={{ textAlign: "center" }}></h3>
+                    <h3 style={{ textAlign: "center" }}> </h3>
                     <div style={{ textAlign: "center" }}>
                         <Button type="primary" shape="round" size="large" onClick={this.showModal}>
                             Đặt chỗ
@@ -376,6 +418,31 @@ class PlaceList extends React.Component {
     changeEvent = e => {
         this.setState({ type: e.key });
     };
+
+    // Support function for restaurant omni-filter
+    changeRestaurantPresent = () => {
+        let newTypeRestaurant = this.state.typeRestaurant
+        newTypeRestaurant.present = !newTypeRestaurant.present
+        this.setState({
+            typeRestaurant: newTypeRestaurant
+        }) 
+    }
+
+    changeRestaurantSeating = (e) => {
+        let newTypeRestaurant = this.state.typeRestaurant
+        newTypeRestaurant.seating = parseInt(e.key, 10)
+        this.setState({
+            typeRestaurant: newTypeRestaurant
+        })
+    }
+
+    changeKidPlayground = (e) => {
+        let newTypeRestaurant = this.state.typeRestaurant
+        newTypeRestaurant.kidPlayground = 1 - this.state.typeRestaurant.kidPlayground
+        this.setState({
+            typeRestaurant: newTypeRestaurant
+        })
+    }
 
     showModal = () => {
         this.setState({
@@ -463,10 +530,11 @@ class PlaceList extends React.Component {
 
 
     render() {
-        console.log(this.state.item)
+        // console.log(this.state.item)
         var FilteredData, rawData;
         const lowerCaseQuery = this.state.query.toLowerCase();
 
+        // Filter theo tab
         if (this.state.tabPosition === "palace") {
             rawData = this.state.placeList;
         }
@@ -478,6 +546,7 @@ class PlaceList extends React.Component {
             rawData = this.state.presentList;
         }
 
+        // Filter theo giá
         if (this.state.priceFilter === "Tất cả") {
             FilteredData = rawData;
         }
@@ -497,7 +566,39 @@ class PlaceList extends React.Component {
             FilteredData = rawData.filter(x => x["cost"] >= 1000000 );
         }
 
+        // Filter theo loại
         FilteredData = this.state.type === "Tất cả" ? FilteredData : FilteredData.filter(x => String(x["type"]).includes(this.state.type));
+
+        // Omni filter cho nhà hàng
+        if (this.state.type === "Nhà hàng") {
+            if (this.state.typeRestaurant.present) {
+                FilteredData = FilteredData.filter(place => {
+                    return place.typeRestaurant.present === true
+                })
+            } 
+            
+            if (this.state.typeRestaurant.kidPlayground !== 0) {
+                FilteredData = FilteredData.filter(place => {
+                    return place.typeRestaurant.kidPlayground === 1
+                })
+            }
+            
+            if (this.state.typeRestaurant.seating !== 0) {
+                FilteredData = FilteredData.filter(place => {
+                    return place.typeRestaurant.seating.includes(this.state.typeRestaurant.seating)
+                })
+            }
+        }
+
+        // Omni filter cho rap chieu phim
+        if (this.state.type === "Rạp chiếu phim") { 
+            // IMPLEMENT
+        }
+
+        // Omni filter cho Quan ca phe 
+        if (this.state.type === "Quán cà phê") { 
+            // IMPLEMENT
+        }
 
         let data = orderBy(this.state.query? FilteredData.filter(x => String(x["name"]).toLowerCase().includes(lowerCaseQuery)): FilteredData);
 
@@ -590,9 +691,20 @@ class PlaceList extends React.Component {
                                     <Button>{this.state.type} <DownOutlined /> </Button>
                                     </Dropdown>
 
-                                    {this.state.type === "Nhà hàng" ? <Dropdown overlay={typeMenu} trigger={['click']}>
+                                    {/* {this.state.type === "Nhà hàng" ? <Dropdown overlay={typeMenu}>
                                     <Button>{this.state.type} <DownOutlined /> </Button>
-                                    </Dropdown>:null}
+                                    </Dropdown>:null} */}
+
+                                    {/* {this.state.type === "Nhà hàng" ? <Dropdown overlay={<Restaurant type={this.state.type} changeType={this.changeType}/>} trigger={['click']}>
+                                    <Button>{this.state.type} <DownOutlined /> </Button>
+                                    </Dropdown>:null} */}
+                                    {this.state.type === "Nhà hàng" ? 
+                                        <Restaurant 
+                                            typeRestaurant={this.state.typeRestaurant} 
+                                            changeRestaurantPresent={this.changeRestaurantPresent}
+                                            changeRestaurantSeating={this.changeRestaurantSeating}
+                                            changeKidPlayground={this.changeKidPlayground}/> 
+                                        : null}
 
                                     {/* <Radio.Group disabled={true}>
                                         <Radio.Button value="date">2 người</Radio.Button>
