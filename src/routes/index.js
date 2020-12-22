@@ -30,6 +30,15 @@ const Routes = () => (
         <Route path='/'>
             <Redirect to='/home' />
         </Route>
+        <Route path='/login'>
+            <Signin />
+        </Route>
+        <Route path='/register'>
+            <Signup />
+        </Route>
+        <Route path='/profile'>
+            <Profile />
+        </Route>
     </Switch>
 );
 

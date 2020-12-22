@@ -13,6 +13,7 @@ const { Content } = Layout;
 const layout = {
     labelCol: { span: 8 },
     wrapperCol: { span: 18, offset: 3 },
+
 };
 const tailLayout = {
     wrapperCol: { offset: 5, span: 16 },
@@ -60,10 +61,6 @@ class Signin extends Component {
     });
   }
 
-  // handleSignUp() {
-  //   return <Redirect to="/register" />
-  // }
-
   handleLogin(e) {
     e.preventDefault();
 
@@ -86,6 +83,7 @@ class Signin extends Component {
           message: 'Success',
           description: 'You are logged in!',
           duration: 5
+
       });
         },
         error => {
@@ -105,6 +103,7 @@ class Signin extends Component {
             message: 'Incorrect username or password.',
             description: 'Please try again',
             duration: 5
+
         });
         }
       );
@@ -127,6 +126,7 @@ class Signin extends Component {
                 <Layout className="layout" style={{ background: "#fff", marginLeft: 50, marginRight: 50 }}>
                 {/* <Content className='main'> */}
                     <div className="site-layout-content" style={{width: "30%", marginTop: 100 }}>
+
                         <Form
                             {...layout}
                             name="basic"

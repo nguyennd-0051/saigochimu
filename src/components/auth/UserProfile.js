@@ -355,7 +355,6 @@ export default class Profile extends Component {
     ];
     
     
-
     return (
       <>
       <NavBar
@@ -371,6 +370,7 @@ export default class Profile extends Component {
               <Descriptions bordered column={1}>
                   <Descriptions.Item label="User Name"><strong>{currentUser.username}</strong></Descriptions.Item>
                   <Descriptions.Item label="Email"><strong>{currentUser.email}</strong></Descriptions.Item>
+
                   <Descriptions.Item label="Role"><strong>{currentUser.roles}</strong></Descriptions.Item>
               </Descriptions>
             </div>
@@ -393,7 +393,6 @@ export default class Profile extends Component {
         ) : null}
       
       </Layout>
-
       {/* <div className="container">
         <header className="jumbotron">
           <h3>

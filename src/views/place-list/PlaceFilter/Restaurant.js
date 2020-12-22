@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Menu, Dropdown, Button, Switch, Space, Radio } from 'antd'
+import { Menu, Dropdown, Button, Space, Radio } from 'antd'
 import { DownOutlined } from '@ant-design/icons';
 
 export default function Restaurant(props) {
@@ -16,6 +16,14 @@ export default function Restaurant(props) {
     </Menu>
   )
 
+  const options1 = [
+    { label: 'Trông trẻ'},
+  ];
+
+  const options2 = [
+    { label: 'Tặng quà'},
+  ];
+
   const typeSeating = (
     props.typeRestaurant ? (
       props.typeRestaurant.seating === 0 ? "Tất cả" :
@@ -27,21 +35,25 @@ export default function Restaurant(props) {
 
   const radioStyle = {
     display: 'block',
-    height: '30px',
-    lineHeight: '30px',
+    height: '100%',
+    textAlign: 'center',
+    borderRadius: '25px',
   };
 
   return (
-    <Space style={{ margin: "auto" }}>
-      <Switch checkedChildren="Tặng quà" unCheckedChildren="Tặng quà" onClick={props.changeRestaurantPresent} />
-
-
+    <Space style={{float:"right",marginLeft:"auto"}} >
       Loại chỗ: <Dropdown overlay={typePresent} trigger={['click']}>
-        <Button>{typeSeating} <DownOutlined /> </Button>
+        <Button shape="round">{typeSeating} <DownOutlined /> </Button>
       </Dropdown>
 
-      <Radio.Group value={props.typeRestaurant.kidPlayground}>
+      {/* <Switch style={{height:"100%"}} checkedChildren="Tặng quà" unCheckedChildren="Tặng quà" onClick={props.changeRestaurantPresent} /> */}
+
+      <Radio.Group value={props.typeRestaurant.kidPlayground} >
         <Radio.Button style={radioStyle} value={1} onClick={props.changeKidPlayground}>Trông trẻ</Radio.Button>
+      </Radio.Group>
+
+      <Radio.Group value={props.typeRestaurant.present} >
+        <Radio.Button style={radioStyle} value={1} onClick={props.changeRestaurantPresent}>Tặng quà</Radio.Button>
       </Radio.Group>
     </Space>
   )
