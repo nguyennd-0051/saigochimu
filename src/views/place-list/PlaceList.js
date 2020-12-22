@@ -14,8 +14,7 @@ import SearchBar from '../../components/searchBar/searchBar';
 import AuthService from "../../services/auth.service";
 import Restaurant from './PlaceFilter/Restaurant'
 import Cinema from './PlaceFilter/Cinema'
-
-
+import Cafe from './PlaceFilter/Cafe'
 
 // import UserService from "../../services/user.service";
 
@@ -31,7 +30,6 @@ const layout = {
 const key = 'updatable';
 const exampleTagList = ["All","React","Blockchain","PHP","BrSE","AI"]
 const { Content, Footer } = Layout;
-// const dateFormat = {year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'};
 
 const BookForm = (handleEditName, handleEditPhoneNumber, handleEditPeopleNumber, handleOk) => {
 
@@ -142,6 +140,10 @@ class PlaceList extends React.Component {
             typeCinema:{
                 sweetBox: 0, // 0 - Kamawanai, 1 - Có
             },
+            typeCoffee: {
+                view: 0, // 0 - Kamawanai, 1 - Có
+                noSmoking: 0, // 0 - Kamawanai, 1 - Có
+            },
             event: "Tất cả",
             screenWidth: window.innerWidth,
             screenHeight: window.innerHeight,
@@ -197,7 +199,14 @@ class PlaceList extends React.Component {
 
                         // set Quan ca phe
                         if (place.type === "Quán cà phê") {
-                            // IMPLEMENT!!!
+                            let typeCoffee = {
+                                view: 0,
+                                noSmoking: 0,
+                            }
+                            if (place.id % 3 === 1) typeCoffee.view = 1
+                            if (place.id % 2 === 1) typeCoffee.noSmoking = 1
+                            place.typeCoffee = typeCoffee
+                            return place
                         }
 
                         return place
@@ -446,7 +455,7 @@ class PlaceList extends React.Component {
         })
     }
 
-    changeKidPlayground = (e) => {
+    changeKidPlayground = () => {
         let newTypeRestaurant = this.state.typeRestaurant
         newTypeRestaurant.kidPlayground = 1 - this.state.typeRestaurant.kidPlayground
         this.setState({
@@ -461,6 +470,24 @@ class PlaceList extends React.Component {
             typeCinema: newTypeCinema
         })
     }
+
+    changeCoffeeView = () => {
+        let newTypeCoffee = this.state.typeCoffee
+        newTypeCoffee.view = 1 - this.state.typeCoffee.view
+        this.setState({
+            typeCoffee: newTypeCoffee
+        })
+    }
+
+    changeCoffeeNoSmoking = () => {
+        let newTypeCoffee = this.state.typeCoffee
+        newTypeCoffee.noSmoking = 1 - this.state.typeCoffee.noSmoking
+        this.setState({
+            typeCoffee: newTypeCoffee
+        })
+    }
+    
+    
 
     showModal = () => {
         this.setState({
@@ -620,7 +647,17 @@ class PlaceList extends React.Component {
 
         // Omni filter cho Quan ca phe 
         if (this.state.type === "Quán cà phê") { 
-            // IMPLEMENT
+            if (this.state.typeCoffee.view) {
+                FilteredData = FilteredData.filter(place => {
+                    return place.typeCoffee.view === 1
+                })
+            }
+
+            if (this.state.typeCoffee.noSmoking) {
+                FilteredData = FilteredData.filter(place => {
+                    return place.typeCoffee.noSmoking === 1
+                })
+            }
         }
 
         let data = orderBy(this.state.query? FilteredData.filter(x => String(x["name"]).toLowerCase().includes(lowerCaseQuery)): FilteredData);
