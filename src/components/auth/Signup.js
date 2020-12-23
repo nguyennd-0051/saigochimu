@@ -92,6 +92,7 @@ export default class Signup extends Component {
       });    }
      else {
       if (this.state.password === this.state.repassword) {
+
         AuthService.register(
           this.state.username,
           this.state.email,
@@ -107,6 +108,7 @@ export default class Signup extends Component {
               message: 'Success',
               description: 'Created new account successfully',
               duration: 5
+
           });
           },
           error => {
@@ -155,6 +157,7 @@ export default class Signup extends Component {
           <NavBar />
           <Layout className="layout" style={{ background: "#fff", marginLeft: 50, marginRight: 50 }}>
             <div className="site-layout-content" style={{width: "40%", marginTop: 100 }}>
+
             <Form 
               {...layout} 
               name="nest-messages" 
@@ -172,12 +175,14 @@ export default class Signup extends Component {
             label="Tên đăng nhập"
             name="Name"
             rules={[{ min: 8, message: 'Username must be minimum 8 characters.' },{ required: true, message: 'Please input your nick name!' }]}
+
           >
             <Input onChange={e => this.onChangeUsername(e)} />
           </Form.Item>
 
           <Form.Item
             label="Địa chỉ email"
+
             name="Email"
             rules={[{
               type: 'email',
@@ -190,6 +195,7 @@ export default class Signup extends Component {
             label="Mật khẩu"
             name="password"
             rules={[{ min: 8, message: 'Password must be minimum 8 characters!' },{ required: true, message: 'Please input your password!' }]}
+
           >
             <Input.Password
               //   value={pass}

@@ -121,6 +121,7 @@ class PlaceDetail extends React.Component {
         userEmail: "",
         bookingAt: "",
         status: "processing",
+
       },
       currentUser: undefined,
       palaceInfo: {},

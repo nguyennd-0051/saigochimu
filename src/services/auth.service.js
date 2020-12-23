@@ -2,6 +2,7 @@ import axios from "axios";
 
 const API_URL = "https://enigmatic-everglades-66523.herokuapp.com/api/auth/";
 
+
 class AuthService {
   login(username, password) {
     return axios
@@ -41,6 +42,7 @@ class AuthService {
     }
     else return false;
   }
+
 }
 
 export default new AuthService();

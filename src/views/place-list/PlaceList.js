@@ -13,7 +13,8 @@ import axios from "axios";
 import SearchBar from '../../components/searchBar/searchBar';
 import AuthService from "../../services/auth.service";
 import Restaurant from './PlaceFilter/Restaurant'
-
+import Cinema from './PlaceFilter/Cinema'
+import Cafe from './PlaceFilter/Cafe'
 
 // import UserService from "../../services/user.service";
 
@@ -29,7 +30,6 @@ const layout = {
 const key = 'updatable';
 const exampleTagList = ["All","React","Blockchain","PHP","BrSE","AI"]
 const { Content, Footer } = Layout;
-// const dateFormat = {year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'};
 
 const BookForm = (handleEditName, handleEditPhoneNumber, handleEditPeopleNumber, handleOk) => {
 
@@ -87,7 +87,7 @@ const BookForm = (handleEditName, handleEditPhoneNumber, handleEditPeopleNumber,
         </Form.Item>
   
         <Form.Item {...tailLayout}>
-          <Button htmlType="submit" type="primary">
+          <Button shape='round' htmlType="submit" type="primary">
             Đặt ngay
           </Button>
         </Form.Item>
@@ -133,9 +133,16 @@ class PlaceList extends React.Component {
             priceFilter: "Tất cả",
             type: "Tất cả",
             typeRestaurant: {
-                present: false,
+                present: 0,
                 kidPlayground: 0, // 0 - Kamawanai, 1 - Có
                 seating: 0, // 0 - All, 1 - date, 2 - family
+            },
+            typeCinema:{
+                sweetBox: 0, // 0 - Kamawanai, 1 - Có
+            },
+            typeCoffee: {
+                view: 0, // 0 - Kamawanai, 1 - Có
+                noSmoking: 0, // 0 - Kamawanai, 1 - Có
             },
             event: "Tất cả",
             screenWidth: window.innerWidth,
@@ -172,22 +179,34 @@ class PlaceList extends React.Component {
                                 kidPlayground: false,
                                 seating: [],
                             }
-                            if (place.id % 3 === 1) typeRestaurant.present = true 
+                            if (place.id % 3 === 1) typeRestaurant.present = 1 
                             if (place.id % 4 === 1) typeRestaurant.kidPlayground = 1 
                             if (place.id % 5 !== 2) typeRestaurant.seating.push(1)
                             if (place.id % 8 !== 3) typeRestaurant.seating.push(2)
                             place.typeRestaurant = typeRestaurant
                             return place
                         }
-
+                        
                         // set Rap chieu phim
                         if (place.type === "Rạp chiếu phim") {
-                            // IMPLEMENT!!!
-                        }
+                            let typeCinema = {
+                                sweetBox: false,
+                            }
+                            if (place.id % 7 === 5 || place.id % 7 === 2 ||place.id % 7 === 3) typeCinema.sweetBox = 1 
+                            place.typeCinema = typeCinema
+                            return place
+                        }                     
 
                         // set Quan ca phe
                         if (place.type === "Quán cà phê") {
-                            // IMPLEMENT!!!
+                            let typeCoffee = {
+                                view: 0,
+                                noSmoking: 0,
+                            }
+                            if (place.id % 3 === 1) typeCoffee.view = 1
+                            if (place.id % 2 === 1) typeCoffee.noSmoking = 1
+                            place.typeCoffee = typeCoffee
+                            return place
                         }
 
                         return place
@@ -345,7 +364,7 @@ class PlaceList extends React.Component {
                         onFinish={this.openMessage}
                         onCancel={this.handleCancel}
                         footer={[
-                        <Button key="return" onClick={this.handleCancel }>
+                        <Button shape="round" key="return" onClick={this.handleCancel }>
                             Quay lại
                         </Button>,
                         ]}
@@ -422,7 +441,7 @@ class PlaceList extends React.Component {
     // Support function for restaurant omni-filter
     changeRestaurantPresent = () => {
         let newTypeRestaurant = this.state.typeRestaurant
-        newTypeRestaurant.present = !newTypeRestaurant.present
+        newTypeRestaurant.present = 1 - this.state.typeRestaurant.present
         this.setState({
             typeRestaurant: newTypeRestaurant
         }) 
@@ -436,13 +455,39 @@ class PlaceList extends React.Component {
         })
     }
 
-    changeKidPlayground = (e) => {
+    changeKidPlayground = () => {
         let newTypeRestaurant = this.state.typeRestaurant
         newTypeRestaurant.kidPlayground = 1 - this.state.typeRestaurant.kidPlayground
         this.setState({
             typeRestaurant: newTypeRestaurant
         })
     }
+
+    changeSweetBox = (e) => {
+        let newTypeCinema = this.state.typeCinema
+        newTypeCinema.sweetBox = 1 - this.state.typeCinema.sweetBox
+        this.setState({
+            typeCinema: newTypeCinema
+        })
+    }
+
+    changeCoffeeView = () => {
+        let newTypeCoffee = this.state.typeCoffee
+        newTypeCoffee.view = 1 - this.state.typeCoffee.view
+        this.setState({
+            typeCoffee: newTypeCoffee
+        })
+    }
+
+    changeCoffeeNoSmoking = () => {
+        let newTypeCoffee = this.state.typeCoffee
+        newTypeCoffee.noSmoking = 1 - this.state.typeCoffee.noSmoking
+        this.setState({
+            typeCoffee: newTypeCoffee
+        })
+    }
+    
+    
 
     showModal = () => {
         this.setState({
@@ -530,7 +575,7 @@ class PlaceList extends React.Component {
 
 
     render() {
-        // console.log(this.state.item)
+        console.log(this.state.typeRestaurant)
         var FilteredData, rawData;
         const lowerCaseQuery = this.state.query.toLowerCase();
 
@@ -571,9 +616,9 @@ class PlaceList extends React.Component {
 
         // Omni filter cho nhà hàng
         if (this.state.type === "Nhà hàng") {
-            if (this.state.typeRestaurant.present) {
+            if (this.state.typeRestaurant.present !== 0) {
                 FilteredData = FilteredData.filter(place => {
-                    return place.typeRestaurant.present === true
+                    return place.typeRestaurant.present === 1
                 })
             } 
             
@@ -593,11 +638,26 @@ class PlaceList extends React.Component {
         // Omni filter cho rap chieu phim
         if (this.state.type === "Rạp chiếu phim") { 
             // IMPLEMENT
+            if (this.state.typeCinema.sweetBox !== 0) {
+                FilteredData = FilteredData.filter(place => {
+                    return place.typeCinema.sweetBox === 1
+                })
+            }
         }
 
         // Omni filter cho Quan ca phe 
         if (this.state.type === "Quán cà phê") { 
-            // IMPLEMENT
+            if (this.state.typeCoffee.view) {
+                FilteredData = FilteredData.filter(place => {
+                    return place.typeCoffee.view === 1
+                })
+            }
+
+            if (this.state.typeCoffee.noSmoking) {
+                FilteredData = FilteredData.filter(place => {
+                    return place.typeCoffee.noSmoking === 1
+                })
+            }
         }
 
         let data = orderBy(this.state.query? FilteredData.filter(x => String(x["name"]).toLowerCase().includes(lowerCaseQuery)): FilteredData);
@@ -619,7 +679,6 @@ class PlaceList extends React.Component {
                 <Menu.Item key="Nhà hàng" value="">Nhà hàng</Menu.Item>
                 <Menu.Item key="Rạp chiếu phim" value="">Rạp chiếu phim</Menu.Item>
                 <Menu.Item key="Quán cà phê" value="">Quán cà phê</Menu.Item>
-                {/* <Menu.Item key="fastfood" value="">Đồ ăn nhanh</Menu.Item> */}
             </Menu>
         )
 
@@ -667,12 +726,9 @@ class PlaceList extends React.Component {
                 <br/>
                 <br/>
                 <Content style={{ width: "100%", padding: '0 200px', margin: "auto", minHeight: '90vh' }}>
-                    {/* <div className="site-layout-content"> */}
                     <Tabs defaultActiveKey={this.state.tabPosition} style={{fontSize:"1.3em",}} size="large"  onChange={e => this.changeTabPosition(e)} centered>
-                        {/* <div style={{width:"60%", margin: "auto", marginBottom: "2em" }}>
-                        </div> */}
                         <TabPane tab="Đặt chỗ" key="palace">
-                            <div className="search-bar" style={{width:"60%", margin: "auto", marginBottom: "2em" }}>
+                            <div className="search-bar" style={{width:"80%", margin: "auto", marginBottom: "2em" }}>
                                 <SearchBar 
                                     value={this.state.query}
                                     handleSearch={this.handleSearch}
@@ -680,45 +736,36 @@ class PlaceList extends React.Component {
                                 </SearchBar>
                             </div>
                             
-                            <div style={{width:"60%", margin: "auto", marginBottom: "2em" }}>
-                                <Space style={{ margin: "auto" }}>
-                                
+                            <div style={{width:"80%", margin: "auto", marginBottom: "2em" }}>
+                                <div style={{ margin: "auto", width:"100%"}}>                                
                                     Giá: <Dropdown overlay={priceMenu} trigger={['click']}>
-                                        <Button style={{marginRight: "4em" }}>{this.state.priceFilter} <DownOutlined /> </Button>
+                                        <Button shape="round" style={{marginRight: "0.5em" }}>{this.state.priceFilter} <DownOutlined /> </Button>
                                     </Dropdown>
-
                                     Loại: <Dropdown overlay={typeMenu} trigger={['click']}>
-                                    <Button>{this.state.type} <DownOutlined /> </Button>
+                                    <Button shape="round">{this.state.type} <DownOutlined /> </Button>
                                     </Dropdown>
-
-                                    {/* {this.state.type === "Nhà hàng" ? <Dropdown overlay={typeMenu}>
-                                    <Button>{this.state.type} <DownOutlined /> </Button>
-                                    </Dropdown>:null} */}
-
-                                    {/* {this.state.type === "Nhà hàng" ? <Dropdown overlay={<Restaurant type={this.state.type} changeType={this.changeType}/>} trigger={['click']}>
-                                    <Button>{this.state.type} <DownOutlined /> </Button>
-                                    </Dropdown>:null} */}
                                     {this.state.type === "Nhà hàng" ? 
-                                        <Restaurant 
+                                        <Restaurant  
                                             typeRestaurant={this.state.typeRestaurant} 
                                             changeRestaurantPresent={this.changeRestaurantPresent}
                                             changeRestaurantSeating={this.changeRestaurantSeating}
                                             changeKidPlayground={this.changeKidPlayground}/> 
-                                        : null}
-
-                                    {/* <Radio.Group disabled={true}>
-                                        <Radio.Button value="date">2 người</Radio.Button>
-                                        <Radio.Button value="family">Gia đình</Radio.Button>
-                                    </Radio.Group> */}
-                                </Space>
+                                    : null} 
+                                    {this.state.type === "Rạp chiếu phim" ? 
+                                        <Cinema  
+                                            typeCinema={this.state.typeCinema} 
+                                            changeSweetBox={this.changeSweetBox}/> 
+                                    : null} 
+                                    {this.state.type === "Quán cà phê" ? 
+                                        <Cafe  
+                                            typeCoffee={this.state.typeCoffee} 
+                                            changeCoffeeView={this.changeCoffeeView}
+                                            changeCoffeeNoSmoking={this.changeCoffeeNoSmoking}/> 
+                                    : null} 
+                                </div>
                             </div>
                             <Row>
                                 <>
-                                    {/*<TagList*/}
-                                    {/*    tagList = {this.state.tagList}*/}
-                                    {/*    filterTagList = {this.state.filterTagList}*/}
-                                    {/*    handleChangeFilterTag = {this.handleChangeFilterTag}*/}
-                                    {/*/>*/}
                                     {this.renderPostList(this.state.filterTagList, data)}
                                 </>
                             </Row>
@@ -726,29 +773,27 @@ class PlaceList extends React.Component {
                         <TabPane tab="Combo" key="combo">
                             <Row>
                                 <>
-                                {/* <span>{rawData[0].startTime}</span> */}
                                     {this.state.tabPosition === "combo" ? this.renderSetList(this.state.filterTagList, rawData) : null}
                                 </>
                             </Row>
                         </TabPane>
                         <TabPane tab="Quà tặng" key="present">
-                            <div className="search-bar" style={{width:"60%", margin: "auto", marginBottom: "2em" }}>
+                            <div className="search-bar" style={{width:"80%", margin: "auto", marginBottom: "2em" }}>
                                 <SearchBar 
                                     value={this.state.query}
                                     handleSearch={this.handleSearch}
                                 >
                                 </SearchBar>
                             </div>
-                            
-                            <div style={{width:"60%", margin: "auto", marginBottom: "2em" }}>
+                            <div style={{width:"80%", margin: "auto", marginBottom: "2em" }}>
                                 <Space style={{ margin: "auto" }}>
                                 
                                     Giá: <Dropdown overlay={priceMenu} trigger={['click']}>
-                                        <Button style={{marginRight: "4em" }}>{this.state.priceFilter} <DownOutlined /> </Button>
+                                        <Button shape="round" style={{marginRight: "0.5em" }}>{this.state.priceFilter} <DownOutlined /> </Button>
                                     </Dropdown>
 
                                     Sự kiện: <Dropdown overlay={eventMenu} trigger={['click']}>
-                                    <Button>{this.state.type} <DownOutlined /> </Button>
+                                    <Button shape="round">{this.state.type} <DownOutlined /> </Button>
                                     </Dropdown>
                                 </Space>
                             </div>
@@ -758,9 +803,7 @@ class PlaceList extends React.Component {
                                 </>
                             </Row>
                         </TabPane> 
-                    {/* </div> */}
                     </Tabs>
-
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>Group6 ©2020 ITSS</Footer>
             </Layout>

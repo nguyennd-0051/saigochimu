@@ -3,6 +3,7 @@ import authHeader from './auth-header';
 
 const API_URL = 'https://enigmatic-everglades-66523.herokuapp.com/api/test/';
 
+
 class UserService {
   getPublicContent() {
     return axios.get(API_URL + 'all');
