@@ -1,9 +1,13 @@
 import React from "react";
 import NavBar from "../navbar/NavBar";
+import CommentInstance from "../comment/CommentInstance";
+import CommentAddBox from "../comment/CommentAddBox";
 import "./PlaceDetail.css";
-import { Layout, Carousel, Descriptions, Rate, Button, Modal, Form, Input, InputNumber, DatePicker, TimePicker, message } from 'antd';
+import { Layout, Carousel, Descriptions, Rate, Button, Modal, Form, Input, InputNumber, DatePicker, TimePicker, message, Popconfirm } from 'antd';
 import * as axios from 'axios';
 import AuthService from "../../services/auth.service";
+import { Redirect, Link } from 'react-router-dom';
+
 
 
 const { Footer } = Layout;
@@ -126,6 +130,9 @@ class PlaceDetail extends React.Component {
       currentUser: undefined,
       palaceInfo: {},
       visible: false,
+      comments: [],
+      submitting: false,
+      EdtValue: '',
     };
 
     this.handleEditName = this.handleEditName.bind(this);
@@ -154,6 +161,25 @@ class PlaceDetail extends React.Component {
         console.log(this.props.match.params.id);
       })
       .catch(err => console.log(err));
+
+      // axios.get(
+      //   `http://localhost:8000/api/comment/getAllCommentOfPlace/${this.props.match.params.id}`
+      // )
+      //   .then(response => {
+      //     let comments = [];
+      //     response.data.comments.map((index, comment) => {
+      //       let commentInstance = {
+      //         author: comment.username,
+      //         avatar: comment.avatar,
+      //         content: comment.content
+      //       };
+      //       comments.push(commentInstance);
+      //     });
+      //     this.setState({ 
+      //       comments: comments,
+      //     });
+      //   })
+      //   .catch(err => console.log(err));
 
     const user = AuthService.getCurrentUser();
 	
@@ -272,6 +298,104 @@ class PlaceDetail extends React.Component {
     this.setState({item: item});
   }
 
+  // state = {
+  //   comments: [{
+  //     author: 'Han Solo',
+  //     avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+  //     content: <p>1234</p>,
+  //     datetime: moment().fromNow(),
+  //   },],
+  //   submitting: false,
+  //   value: '',
+  // };
+
+  handleAddCmtSubmit = () => {
+    if (!this.state.EdtValue) {
+      return;
+    }
+
+    if(!this.state.currentUser) {
+      return;
+    }
+
+    this.setState({
+      submitting: true,
+    });
+
+    let value = this.state.EdtValue;
+
+    const CmtData = {
+      userID: this.state.currentUser.id,
+      username: this.state.currentUser.username,
+      userEmail: this.state.currentUser.email,
+      placeID: this.state.palaceInfo.id,
+      avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSv4Hviqmchu_hUMBjF-CWJaFVpNVbS05hI5w&usqp=CAU',
+      content: value,
+      datetime: Date().toLocaleString(),
+    };
+    // bookingData.bookingAt = Date().toLocaleString();
+
+    axios.post(`https://enigmatic-everglades-66523.herokuapp.com/api/comment/create`, CmtData)
+    .then(res => {
+      console.log(res.data)
+      this.setState({ 
+        submitting: false,
+        EdtValue: '',
+      });
+      // if (res.data.success === 1) {
+      //   setTimeout(() => {
+      //     message.success({ content: 'Bạn đã đặt thành công!', key, duration: 2 });
+      //   }, 200);
+      //   this.setState({
+      //     visible: false,
+      //   });
+      // }
+      // else {
+      //   setTimeout(() => {
+      //     message.error({ content: "Thất bại", key, duration: 2 });
+      //   }, 200);
+      // }
+    })
+    .catch((err) => {
+      console.log(err);
+      setTimeout(() => {
+        message.error({ content: "Thất bại", key, duration: 2 });
+      }, 200);
+    });
+
+    // setTimeout(() => {
+    //   this.setState({
+    //     submitting: false,
+    //     value: '',
+    //     comments: [
+    //       {
+    //         author: 'Han Solo',
+    //         avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+    //         content: <p>{this.state.value}</p>,
+    //         datetime: moment().fromNow(),
+    //       },
+    //       ...this.state.comments,
+    //     ],
+    //   });
+    // }, 1000);
+  };
+
+  handleChangeCmtTextBox = e => {
+    this.setState({
+      EdtValue: e.target.value,
+    });
+  };
+
+  handleDeleteCmt = cmtid => {
+    axios.put(`https://enigmatic-everglades-66523.herokuapp.com/api/comment/delete/${cmtid}`, { userID: this.state.currentUser.id })
+      .then(res => {
+          console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   
 
   openMessage = () => {
@@ -284,8 +408,29 @@ class PlaceDetail extends React.Component {
 
 
   render() {
-    console.log(this.state.item)
-    // const key = 'updatable';
+    // console.log(this.state.comments)
+    const key = 'updatable';
+    axios.get(
+      `https://enigmatic-everglades-66523.herokuapp.com/api/comment/getAllCommentOfPlace/${this.props.match.params.id}`
+    )
+      .then(response => {
+        let comments = [];
+        response.data.comments.map((comment) => {
+          let commentInstance = {
+            author: comment.username,
+            avatar: comment.avatar,
+            content: comment.content,
+            cmtid: comment._id,
+            userid: comment.userID,
+          };
+          comments.push(commentInstance);
+        });
+        comments.reverse();
+        this.setState({ 
+          comments: comments,
+        });
+      })
+      .catch(err => console.log(err));
     return (
         <>
         <NavBar
@@ -336,9 +481,6 @@ class PlaceDetail extends React.Component {
                   <Button key="return" onClick={this.handleCancel }>
                     Quay lại
                   </Button>,
-                  // <Button key="submit" type="primary" onClick={this.handleOk}>
-                  //   Đặt ngay
-                  // </Button>,
                 ]}
               >
                 {BookForm(
@@ -349,24 +491,30 @@ class PlaceDetail extends React.Component {
                   e => this.handleEditPeopleNumber(e),
                   e => this.handleOk(e)
                 )}
-
-                {/* <BookForm
-                  handleEditName = {e => this.handleEditName(e)}
-                  handleEditPhoneNumber = {e => this.handleEditPhoneNumber(e)}
-                  handleEditTime = {e => this.handleEditTime(e)}
-                  handleEditDate = {e => this.handleEditDate(e)}
-                  handleEditPeopleNumber = {e => this.handleEditPeopleNumber(e)}
-
-                >
-
-                </BookForm> */}
               </Modal>
             </div>
-             </>) : null}
+             </>) : (
+             <>
+              <div style={{ margin: "7em" }}>
+                <h2 style={{ textAlign: "center" }}><Link to="/login">ĐĂNG NHẬP</Link> để đặt chỗ và đăng tải bình luận của bạn !</h2>
+              </div>
+             </>
+             )}
+            <h3>Bình luận</h3>
+            <CommentAddBox
+              comments = {this.state.comments}
+              submitting = {this.state.submitting} 
+              handleChange = {this.handleChangeCmtTextBox} 
+              handleSubmit = {this.handleAddCmtSubmit} 
+              handleDelete = {this.handleDeleteCmt}
+              value = {this.state.EdtValue}
+              currentUser = {this.state.currentUser}
+
+            />
             
         </div>
 
-        {/* <Footer style={{ textAlign: 'center' }}> ©2020 魔法使い</Footer> */}
+        <Footer style={{ textAlign: 'center' }}> ©2020 魔法使い</Footer>
       </Layout>
       </>
     );

@@ -1,9 +1,13 @@
 import React from "react";
 import NavBar from "../navbar/NavBar";
+import CommentAddBox from "../comment/CommentAddBox";
+
 import "./PresentDetail.css";
 import { Layout, Carousel, Descriptions, Rate, Button, Modal, Form, Input, InputNumber, DatePicker, TimePicker, message } from 'antd';
 import * as axios from 'axios';
 import AuthService from "../../services/auth.service";
+import { Redirect, Link } from 'react-router-dom';
+
 
 const { Footer } = Layout;
 
@@ -110,6 +114,9 @@ class PresentDetail extends React.Component {
       currentUser: undefined,
       presentInfo: {},
       visible: false,
+      comments: [],
+      submitting: false,
+      EdtValue: '',
     };
 
     this.handleEditName = this.handleEditName.bind(this);
@@ -251,7 +258,62 @@ class PresentDetail extends React.Component {
     this.setState({item: item});
   }
 
-  
+  handleAddCmtSubmit = () => {
+    if (!this.state.EdtValue) {
+      return;
+    }
+
+    if(!this.state.currentUser) {
+      return;
+    }
+
+    this.setState({
+      submitting: true,
+    });
+
+    let value = this.state.EdtValue;
+
+    const CmtData = {
+      userID: this.state.currentUser.id,
+      username: this.state.currentUser.username,
+      userEmail: this.state.currentUser.email,
+      presentID: this.state.presentInfo.id,
+      avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSv4Hviqmchu_hUMBjF-CWJaFVpNVbS05hI5w&usqp=CAU',
+      content: value,
+      datetime: Date().toLocaleString(),
+    };
+
+    axios.post(`https://enigmatic-everglades-66523.herokuapp.com/api/presentComment/create`, CmtData)
+    .then(res => {
+      console.log(res.data)
+      this.setState({ 
+        submitting: false,
+        EdtValue: '',
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      setTimeout(() => {
+        message.error({ content: "Thất bại", key, duration: 2 });
+      }, 200);
+    });
+  };
+
+  handleChangeCmtTextBox = e => {
+    this.setState({
+      EdtValue: e.target.value,
+    });
+  };
+
+  handleDeleteCmt = cmtid => {
+    axios.put(`https://enigmatic-everglades-66523.herokuapp.com/api/presentComment/delete/${cmtid}`, { userID: this.state.currentUser.id })
+      .then(res => {
+          console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   openMessage = () => {
     message.loading({ content: 'Loading...', key });
@@ -261,7 +323,29 @@ class PresentDetail extends React.Component {
   };
 
   render() {
-    console.log(this.state.item)
+    // console.log(this.state.item);
+    axios.get(
+      `https://enigmatic-everglades-66523.herokuapp.com/api/presentComment/getAllCommentOfPresent/${this.props.match.params.id}`
+    )
+      .then(response => {
+        let comments = [];
+        response.data.comments.map((comment) => {
+          let commentInstance = {
+            author: comment.username,
+            avatar: comment.avatar,
+            content: comment.content,
+            cmtid: comment._id,
+            userid: comment.userID,
+          };
+          console.log(commentInstance);
+          comments.push(commentInstance);
+        });
+        comments.reverse();
+        this.setState({ 
+          comments: comments,
+        });
+      })
+      .catch(err => console.log(err));
     return (
       <>
         <NavBar
@@ -333,10 +417,28 @@ class PresentDetail extends React.Component {
                 </BookForm> */}
               </Modal>
             </div>
-             </>) : null}
+             </>) : (
+             <>
+              <div style={{ margin: "7em" }}>
+                <h2 style={{ textAlign: "center" }}><Link to="/login">ĐĂNG NHẬP</Link> để đặt quà và đăng tải bình luận của bạn !</h2>
+              </div>
+             </>
+             )}
+             <h3>Bình luận</h3>
+            <CommentAddBox
+              comments = {this.state.comments}
+              submitting = {this.state.submitting} 
+              handleChange = {this.handleChangeCmtTextBox} 
+              handleSubmit = {this.handleAddCmtSubmit} 
+              handleDelete = {this.handleDeleteCmt}
+              value = {this.state.EdtValue}
+              currentUser = {this.state.currentUser}
+
+            />
           </div>
 
           {/* <Footer style={{ textAlign: 'center' }}> ©2020 魔法使い</Footer> */}
+          <Footer style={{ textAlign: 'center' }}> ©2020 魔法使い</Footer>
         </Layout>
       </>
     );

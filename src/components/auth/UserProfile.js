@@ -29,29 +29,57 @@ export default class Profile extends Component {
   }
 
   componentDidMount() {
+    if (this.state.currentUser) {
+      if (this.state.currentUser.roles == 'ROLE_ADMIN') {
+        axios.get('https://enigmatic-everglades-66523.herokuapp.com/api/order/getAll')
+        .then(res => {
+          // console.log(res.data.orders)
+          // if (this.state.userRole === "ROLE_ADMIN") {
+            this.setState({ orders: res.data.orders })
+          // }
+        })
+        .catch(error => console.log(error));
     
-      axios.get('https://enigmatic-everglades-66523.herokuapp.com/api/order/getAll')
-      .then(res => {
-        console.log(res.data.orders)
-        // if (this.state.userRole === "ROLE_ADMIN") {
-          this.setState({ orders: res.data.orders })
-        // }
-      })
-      .catch(error => console.log(error));
-
-      axios.get('https://enigmatic-everglades-66523.herokuapp.com/api/comboOrder/getAll')
-      .then(res => {
-        console.log(res.data.orders)
-          this.setState({ comboOrders: res.data.orders })
-      })
-      .catch(error => console.log(error));
-
-      axios.get('https://enigmatic-everglades-66523.herokuapp.com/api/presentOrder/getAll')
-      .then(res => {
-        console.log(res.data.orders)
-          this.setState({ presentOrders: res.data.orders })
-      })
-      .catch(error => console.log(error));
+        axios.get('https://enigmatic-everglades-66523.herokuapp.com/api/comboOrder/getAll')
+        .then(res => {
+          // console.log(res.data.orders)
+            this.setState({ comboOrders: res.data.orders })
+        })
+        .catch(error => console.log(error));
+    
+        axios.get('https://enigmatic-everglades-66523.herokuapp.com/api/presentOrder/getAll')
+        .then(res => {
+          // console.log(res.data.orders)
+            this.setState({ presentOrders: res.data.orders })
+        })
+        .catch(error => console.log(error));
+      }
+  
+      else {
+        axios.get(`https://enigmatic-everglades-66523.herokuapp.com/api/order/getAllOrderOfUser/${this.state.currentUser.id}`)
+        .then(res => {
+          // console.log(res.data.orders)
+          // if (this.state.userRole === "ROLE_ADMIN") {
+            this.setState({ orders: res.data.orders })
+          // }
+        })
+        .catch(error => console.log(error));
+    
+        axios.get(`https://enigmatic-everglades-66523.herokuapp.com/api/comboOrder/getAllOrderOfUser/${this.state.currentUser.id}`)
+        .then(res => {
+          // console.log(res.data.orders)
+            this.setState({ comboOrders: res.data.orders })
+        })
+        .catch(error => console.log(error));
+    
+        axios.get(`https://enigmatic-everglades-66523.herokuapp.com/api/presentOrder/getAllOrderOfUser/${this.state.currentUser.id}`)
+        .then(res => {
+          // console.log(res.data.orders)
+            this.setState({ presentOrders: res.data.orders })
+        })
+        .catch(error => console.log(error));
+      }
+    }
     
   }
 
@@ -98,8 +126,67 @@ export default class Profile extends Component {
     
   };
 
+  handleChangePresentOrderStatus = (key) => {
+    console.log(key)
+    axios.put(`https://enigmatic-everglades-66523.herokuapp.com/api/presentOrder/updateStatus`, {orderID: key})
+      .then(res => {
+          console.log(res.data);
+    window.location.reload(false);
+
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    this.setState({
+      tabPosition: "present"
+    });
+    
+  };
+
+  handleDeletePlaceOrder = (key) => {
+    console.log(key)
+    axios.put(`https://enigmatic-everglades-66523.herokuapp.com/api/order/delete`, {orderID: key})
+      .then(res => {
+          console.log(res.data);
+      window.location.reload(false);
+
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  handleDeleteComboOrder = (key) => {
+    console.log(key)
+    axios.put(`https://enigmatic-everglades-66523.herokuapp.com/api/comboOrder/delete`, {orderID: key})
+      .then(res => {
+          console.log(res.data);
+      window.location.reload(false);
+
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  handleDeletePresentOrder = (key) => {
+    console.log(key)
+    axios.put(`https://enigmatic-everglades-66523.herokuapp.com/api/presentOrder/delete`, {orderID: key})
+      .then(res => {
+          console.log(res.data);
+      window.location.reload(false);
+
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   render() {
     const { currentUser } = this.state;
+    
+
+    
 
     var orderDataSource =[]
 
@@ -131,6 +218,7 @@ export default class Profile extends Component {
         title: 'Người đặt',
         dataIndex: 'customer',
         key: 'customer',
+        width: 230,
       },
       {
         title: "",
@@ -143,16 +231,19 @@ export default class Profile extends Component {
         title: 'Thông tin địa điểm',
         dataIndex: 'information',
         key: 'information',
+        width: 300,
       },
       {
         title: 'Thời gian đặt',
         dataIndex: 'orderedAt',
         key: 'orderedAt',
+        width: 200,
       },
       {
         title: 'Tình trạng',
         key: 'status',
         dataIndex: 'status',
+        width: 150,
         render: tag => 
           // <>
             {
@@ -173,14 +264,19 @@ export default class Profile extends Component {
         ,
       },
       {
-        title: 'Action',
+        title: '',
         key: 'action',
         dataIndex: 'action',
         render: (text, record) => 
           orderDataSource.length >= 1 ? (
-            <Popconfirm title="Sure to change?" onConfirm={() => this.handleChangeStatus(record.key)}>
-              <a>Change Status</a>
-            </Popconfirm>
+            <>
+              {currentUser.roles == 'ROLE_ADMIN' &&  <Popconfirm title="Sure to change?" onConfirm={() => this.handleChangeStatus(record.key)}>
+                <a>Change Status</a>
+              </Popconfirm>}
+              <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDeletePlaceOrder(record.key)}>
+                <a style={{marginLeft: "2em"}}>Delete</a>
+              </Popconfirm>
+            </>
           ) : null,
       },
     ];
@@ -214,21 +310,25 @@ export default class Profile extends Component {
         title: 'Người đặt',
         dataIndex: 'customer',
         key: 'customer',
+        width: 230,
       },
       {
         title: 'Thông tin combo',
         dataIndex: 'information',
         key: 'information',
+        width: 300,
       },
       {
         title: 'Thời gian đặt',
         dataIndex: 'orderedAt',
         key: 'orderedAt',
+        width: 200,
       },
       {
         title: 'Tình trạng',
         key: 'status',
         dataIndex: 'status',
+        width: 150,
         render: tag => 
           // <>
             {
@@ -254,9 +354,14 @@ export default class Profile extends Component {
         dataIndex: 'action',
         render: (text, record) => 
           comboOrderDataSource.length >= 1 ? (
-            <Popconfirm title="Sure to change?" onConfirm={() => this.handleChangeComboOrderStatus(record.key)}>
-              <a>Change Status</a>
-            </Popconfirm>
+            <>
+              {currentUser.roles == 'ROLE_ADMIN' &&  <Popconfirm title="Sure to change?" onConfirm={() => this.handleChangeComboOrderStatus(record.key)}>
+                <a>Change Status</a>
+              </Popconfirm>}
+              <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDeleteComboOrder(record.key)}>
+                <a style={{marginLeft: "2em"}}>Delete</a>
+              </Popconfirm>
+            </>
           ) : null,
       },
     ];
@@ -295,11 +400,13 @@ export default class Profile extends Component {
         title: 'Người đặt',
         dataIndex: 'customer',
         key: 'customer',
+        width: 210,
       },
       {
         title: 'Người nhận',
         dataIndex: 'receiverInfo',
         key: 'receiverInfo',
+        width: 250,
       },
       {
         title: "",
@@ -317,11 +424,13 @@ export default class Profile extends Component {
         title: 'Thời gian đặt',
         dataIndex: 'orderedAt',
         key: 'orderedAt',
+        width: 200,
       },
       {
         title: 'Tình trạng',
         key: 'status',
         dataIndex: 'status',
+        width: 150,
         render: tag => 
           // <>
             {
@@ -342,14 +451,19 @@ export default class Profile extends Component {
         ,
       },
       {
-        title: 'Action',
+        title: '',
         key: 'action',
         dataIndex: 'action',
         render: (text, record) => 
           presentOrderDataSource.length >= 1 ? (
-            <Popconfirm title="Sure to change?" onConfirm={() => this.handleChangeStatus(record.key)}>
-              <a>Change Status</a>
-            </Popconfirm>
+            <>
+              {currentUser.roles == 'ROLE_ADMIN' && <Popconfirm title="Sure to change?" onConfirm={() => this.handleChangePresenOrderStatus(record.key)}>
+                <a>Change Status</a>
+              </Popconfirm>}
+              <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDeletePresentOrder(record.key)}>
+                <a style={{marginLeft: "2em"}}>Delete</a>
+              </Popconfirm>
+            </>
           ) : null,
       },
     ];
@@ -376,9 +490,9 @@ export default class Profile extends Component {
             </div>
             
         </div>
-        { currentUser.roles == 'ROLE_ADMIN' ? (
+        {  (
           <>
-            <Tabs style={{ margin: "auto", marginTop: "7em", width: "70%" }} defaultActiveKey={this.state.tabPosition}  onChange={e => this.changeTabPosition(e)} centered>
+            <Tabs style={{ margin: "auto", marginTop: "7em", width: "80%" }} defaultActiveKey={this.state.tabPosition}  onChange={e => this.changeTabPosition(e)} centered>
               <TabPane tab="Đặt chỗ" key="palace">
                 <Table columns={orderColumns} dataSource={orderDataSource} style={{ margin: "auto", marginTop: "2em"}}/>               
               </TabPane> 
@@ -390,7 +504,7 @@ export default class Profile extends Component {
               </TabPane> 
             </Tabs>
           </>
-        ) : null}
+        ) }
       
       </Layout>
       {/* <div className="container">
