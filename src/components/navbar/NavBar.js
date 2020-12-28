@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Menu } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
-import SearchBar from '../searchBar/searchBar';
+// import SearchBar from '../searchBar/searchBar';
 import AuthService from "../../services/auth.service";
 import { Redirect, Link } from 'react-router-dom';
 

@@ -3,10 +3,10 @@ import NavBar from "../navbar/NavBar";
 import CommentAddBox from "../comment/CommentAddBox";
 
 import "./PresentDetail.css";
-import { Layout, Carousel, Descriptions, Rate, Button, Modal, Form, Input, InputNumber, DatePicker, TimePicker, message } from 'antd';
+import { Layout, Descriptions, Rate, Button, Modal, Form, Input, message } from 'antd';
 import * as axios from 'axios';
 import AuthService from "../../services/auth.service";
-import { Redirect, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 
 const { Footer } = Layout;

@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import AuthService from "../../services/auth.service";
 import { Layout, Descriptions} from 'antd';
-import { Modal, Button, Space,  Tabs } from 'antd';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import {  Tabs } from 'antd';
 import NavBar from "../navbar/NavBar";
 import { Table, Tag, Popconfirm } from 'antd';
 import * as axios from 'axios';
@@ -192,10 +191,8 @@ export default class Profile extends Component {
 
     if (this.state.orders !== null) this.state.orders.map((order, index) => {
       let customerInfo = 
-      `Tên người đặt: ${order.name}; 
-      Số điện thoại: ${order.phoneNumber}${"\n"};
-      Số người tham gia: ${order.peopleNumber}`
-      let information = `Tên địa điểm: ${order.placeName}${"\n"}Địa chỉ: ${order.placeAddress}${"\n"}Thời gian: ${order.date} 「${order.time}」`
+      `Tên người đặt: ${order.name}${"\n"}Số điện thoại: ${order.phoneNumber}${"\n"}Số người tham gia: ${order.peopleNumber}`
+      let information = `${order.placeName}${"\n"}${order.placeAddress}${"\n"}Thời gian: ${order.date} 「${order.time}」`
       return orderDataSource.push({
         key: order._id,
         username: order.username,
@@ -233,12 +230,12 @@ export default class Profile extends Component {
         key: 'information',
         width: 300,
       },
-      {
-        title: 'Thời gian đặt',
-        dataIndex: 'orderedAt',
-        key: 'orderedAt',
-        width: 200,
-      },
+      // {
+      //   title: 'Thời gian đặt',
+      //   dataIndex: 'orderedAt',
+      //   key: 'orderedAt',
+      //   width: 200,
+      // },
       {
         title: 'Tình trạng',
         key: 'status',
@@ -274,7 +271,7 @@ export default class Profile extends Component {
                 <a>Change Status</a>
               </Popconfirm>}
               <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDeletePlaceOrder(record.key)}>
-                <a style={{marginLeft: "2em"}}>Delete</a>
+                <a style={{marginLeft: "2em"}}>Hủy</a>
               </Popconfirm>
             </>
           ) : null,
@@ -494,13 +491,13 @@ export default class Profile extends Component {
           <>
             <Tabs style={{ margin: "auto", marginTop: "7em", width: "80%" }} defaultActiveKey={this.state.tabPosition}  onChange={e => this.changeTabPosition(e)} centered>
               <TabPane tab="Đặt chỗ" key="palace">
-                <Table columns={orderColumns} dataSource={orderDataSource} style={{ margin: "auto", marginTop: "2em"}}/>               
+                <Table columns={orderColumns} dataSource={orderDataSource} style={{ margin: "auto", marginTop: "2em", whiteSpace: 'pre'}}/>               
               </TabPane> 
               <TabPane tab="Combo" key="combo">
-                <Table columns={comboOrderColumns} dataSource={comboOrderDataSource} style={{ margin: "auto", marginTop: "2em"}}/>             
+                <Table columns={comboOrderColumns} dataSource={comboOrderDataSource} style={{ margin: "auto", marginTop: "2em", whiteSpace: 'pre'}}/>             
               </TabPane>
               <TabPane tab="Quà tặng" key="present">
-                <Table columns={presentOrderColumns} dataSource={presentOrderDataSource} style={{ margin: "auto", marginTop: "2em"}}/>         
+                <Table columns={presentOrderColumns} dataSource={presentOrderDataSource} style={{ margin: "auto", marginTop: "2em", whiteSpace: 'pre'}}/>         
               </TabPane> 
             </Tabs>
           </>
