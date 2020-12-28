@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Space, Radio } from 'antd'
 
 export default function Cinema(props) {

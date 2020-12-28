@@ -15,9 +15,9 @@ class SearchBar extends Component {
     render() {
         const {
             handleSearch,
-          } = this.props;
+        } = this.props;
 
-        return(
+        return (
             <>
                 <Search
                     placeholder="Nhập tên cửa hàng hoặc món đồ"
