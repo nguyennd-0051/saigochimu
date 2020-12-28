@@ -692,7 +692,7 @@ class PlaceList extends React.Component {
         )
 
         return (
-            <Layout className="layout" style={{ background: "#fff" }}>
+            <Layout className="layout" style={{ background: "#ffd8bf" }}>
                 <NavBar
                     currentPage={this.state.currentPage}
                     onClickChangePage={this.onClickChangePage}

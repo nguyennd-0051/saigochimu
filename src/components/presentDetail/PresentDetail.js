@@ -178,7 +178,7 @@ class PresentDetail extends React.Component {
 
     handleOk = e => {
         // e.preventDefault();
-        message.loading({ content: 'Đang tiến hành đặt chỗ...', key });
+        message.loading({ content: 'Đang tiến hành đặt quà...', key });
         const bookingData = this.state.item;
         bookingData.bookingAt = Date().toLocaleString();
 

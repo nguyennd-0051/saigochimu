@@ -3,7 +3,8 @@ import AuthService from "../../services/auth.service";
 import { Layout, Descriptions } from 'antd';
 import { Tabs } from 'antd';
 import NavBar from "../navbar/NavBar";
-import { Table, Tag, Popconfirm } from 'antd';
+import { Table, Tag, PageHeader, Popconfirm } from 'antd';
+import { UserOutlined, MailOutlined, CrownOutlined } from '@ant-design/icons';
 import * as axios from 'axios';
 
 const { TabPane } = Tabs;
@@ -315,7 +316,7 @@ export default class Profile extends Component {
                 title: 'Thời gian đặt',
                 dataIndex: 'orderedAt',
                 key: 'orderedAt',
-                width: 200,
+                width: 50,
             },
             {
                 title: 'Tình trạng',
@@ -352,7 +353,7 @@ export default class Profile extends Component {
                                 <a href="/#">Change Status</a>
                             </Popconfirm>}
                             <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDeleteComboOrder(record.key)}>
-                                <a href="/#" style={{ marginLeft: "2em" }}>Delete</a>
+                                <a href="/#" style={{ marginLeft: "2em" }}>Xóa</a>
                             </Popconfirm>
                         </>
                     ) : null,
@@ -363,12 +364,9 @@ export default class Profile extends Component {
 
         if (this.state.presentOrders !== null) this.state.presentOrders.map((order, index) => {
             let customerInfo =
-                ` ${order.name}; 
-      Số điện thoại: ${order.phoneNumber}${"\n"}`
+                `${order.name}${"\n"}Số điện thoại: ${order.phoneNumber}`
             let receiverInfo =
-                ` ${order.receiverName}; 
-      Số điện thoại: ${order.receiverNumber}${"\n"};
-      Địa chỉ: ${order.receiverAddress}${"\n"}`
+                `${order.receiverName}${"\n"}Số điện thoại: ${order.receiverPhoneNumber}${"\n"}Địa chỉ: ${order.receiverAddress}${"\n"}`
             let information = `${order.presentName}${"\n"}`
             return presentOrderDataSource.push({
                 key: order._id,
@@ -413,12 +411,12 @@ export default class Profile extends Component {
                 dataIndex: 'information',
                 key: 'information',
             },
-            {
-                title: 'Thời gian đặt',
-                dataIndex: 'orderedAt',
-                key: 'orderedAt',
-                width: 200,
-            },
+            // {
+            //     title: 'Thời gian đặt',
+            //     dataIndex: 'orderedAt',
+            //     key: 'orderedAt',
+            //     width: 100,
+            // },
             {
                 title: 'Tình trạng',
                 key: 'status',
@@ -468,63 +466,58 @@ export default class Profile extends Component {
                     currentPage={this.state.currentPage}
                     onClickChangePage={this.onClickChangePage}
                 />
-                <Layout className="layout" style={{ background: "#fff", marginLeft: 50, marginRight: 50 }}>
-                    <div className="ml-auto mr-auto col-md-8" style={{ margin: "auto", marginTop: 100, width: "50%" }}>
+                <Layout className="layout" style={{ background: "#ffd8bf" }}>
+                    <div className="ml-auto mr-auto col-md-8" style={{ margin: "auto", marginTop: 100, width: "92.5%" }}>
 
-                        <h1 style={{ textAlign: "center" }}><strong>{currentUser.username}</strong>'s Profile</h1>
+                        <h1 style={{ textAlign: "center" }}>Trang cá nhân của <strong>{currentUser.username}</strong></h1>
 
                         <div>
-                            <Descriptions bordered column={1}>
-                                <Descriptions.Item label="User Name"><strong>{currentUser.username}</strong></Descriptions.Item>
-                                <Descriptions.Item label="Email"><strong>{currentUser.email}</strong></Descriptions.Item>
-
-                                <Descriptions.Item label="Role"><strong>{currentUser.roles}</strong></Descriptions.Item>
+                        <PageHeader
+                            style={{
+                                boxShadow: "5px 5px 20px rgba(0,0,0,0.12), 1px 1px 2px rgba(0,0,0,0.24)",
+                                margin: 20,
+                                background: "#fff",
+                                // height: "420px",
+                            }}
+                        >
+                            <Descriptions title="Thông tin người dùng" >
+                                <Descriptions.Item label=""><UserOutlined style={{ marginRight: "1em", fontSize: "1.5em" }}/><span style={{ marginRight: "1em" }}>Tên người dùng:</span><strong>{currentUser.username}</strong></Descriptions.Item>
+                                <Descriptions.Item label=""><MailOutlined style={{ marginRight: "1em", fontSize: "1.5em" }}/><span style={{ marginRight: "1em" }}>Địa chỉ email:</span><strong>{currentUser.email}</strong></Descriptions.Item>
+                                <Descriptions.Item label=""><CrownOutlined style={{ marginRight: "1em", fontSize: "1.5em" }}/><strong>{currentUser.roles}</strong></Descriptions.Item>
                             </Descriptions>
+                        </PageHeader>
                         </div>
 
                     </div>
                     {(
                         <>
-                            <Tabs style={{ margin: "auto", marginTop: "7em", width: "80%" }} defaultActiveKey={this.state.tabPosition} onChange={e => this.changeTabPosition(e)} centered>
-                                <TabPane tab="Đặt chỗ" key="palace">
-                                    <Table columns={orderColumns} dataSource={orderDataSource} style={{ margin: "auto", marginTop: "2em", whiteSpace: 'pre' }} />
-                                </TabPane>
-                                <TabPane tab="Combo" key="combo">
-                                    <Table columns={comboOrderColumns} dataSource={comboOrderDataSource} style={{ margin: "auto", marginTop: "2em", whiteSpace: 'pre' }} />
-                                </TabPane>
-                                <TabPane tab="Quà tặng" key="present">
-                                    <Table columns={presentOrderColumns} dataSource={presentOrderDataSource} style={{ margin: "auto", marginTop: "2em", whiteSpace: 'pre' }} />
-                                </TabPane>
-                            </Tabs>
+                            <PageHeader
+                                title="Lịch sử đặt hàng"
+                                style={{
+                                    margin: "auto",
+                                    boxShadow: "5px 5px 20px rgba(0,0,0,0.12), 1px 1px 2px rgba(0,0,0,0.24)",
+                                    background: "#fff",
+                                    width: "90%",
+                                    marginBottom: "2em"
+                                    // height: "420px",
+                                }}
+                            >
+                                <Tabs style={{ margin: "auto", width: "100%" }} defaultActiveKey={this.state.tabPosition} onChange={e => this.changeTabPosition(e)} centered>
+                                    <TabPane tab="Đặt chỗ" key="palace">
+                                        <Table columns={orderColumns} dataSource={orderDataSource} style={{ margin: "auto", marginTop: "2em", whiteSpace: 'pre' }} />
+                                    </TabPane>
+                                    <TabPane tab="Combo" key="combo">
+                                        <Table columns={comboOrderColumns} dataSource={comboOrderDataSource} style={{ margin: "auto", marginTop: "2em", whiteSpace: 'pre' }} />
+                                    </TabPane>
+                                    <TabPane tab="Quà tặng" key="present">
+                                        <Table columns={presentOrderColumns} dataSource={presentOrderDataSource} style={{ margin: "auto", marginTop: "2em", whiteSpace: 'pre' }} />
+                                    </TabPane>
+                                </Tabs>
+                            </PageHeader>
                         </>
                     )}
 
                 </Layout>
-                {/* <div className="container">
-        <header className="jumbotron">
-          <h3>
-            <strong>{currentUser.username}</strong> Profile
-          </h3>
-        </header>
-        <p>
-          <strong>Token:</strong>{" "}
-          {currentUser.accessToken.substring(0, 20)} ...{" "}
-          {currentUser.accessToken.substr(currentUser.accessToken.length - 20)}
-        </p>
-        <p>
-          <strong>Id:</strong>{" "}
-          {currentUser.id}
-        </p>
-        <p>
-          <strong>Email:</strong>{" "}
-          {currentUser.email}
-        </p>
-        <strong>Authorities:</strong>
-        <ul>
-          {currentUser.roles &&
-            currentUser.roles.map((role, index) => <li key={index}>{role}</li>)}
-        </ul>
-      </div> */}
             </>
         );
     }
